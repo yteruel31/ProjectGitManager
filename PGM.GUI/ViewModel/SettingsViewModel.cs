@@ -3,21 +3,11 @@ using System.IO;
 using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
 using PGM.GUI.Properties;
+using PGM.Lib.Model;
 
 namespace PGM.GUI.ViewModel
 {
-    public interface ISettings
-    {
-        string GitApiKey { get; }
-
-        string Repertoire { get; }
-
-        string Accronyme { get; }
-
-        string ProjectId { get; }
-    }
-
-    public class SettingsViewModel : ObservableObject, ISettings
+    public class SettingsViewModel : ObservableObject, IPGMSettings
     {
         public string GitApiKey
         {
@@ -37,20 +27,20 @@ namespace PGM.GUI.ViewModel
             }
         }
 
-        public string Repertoire
+        public string RepositoryPath
         {
             get
             {
-                if (string.IsNullOrEmpty(_repertoire))
+                if (string.IsNullOrEmpty(_repositoryPath))
                 {
                     Read();
                 }
 
-                return _repertoire;
+                return _repositoryPath;
             }
             set
             {
-                _repertoire = value;
+                _repositoryPath = value;
                 Write();
             }
         }
@@ -108,7 +98,7 @@ namespace PGM.GUI.ViewModel
             if (!File.Exists(path))
             {
                 _gitApiKey = Settings.Default.GitApiKey;
-                _repertoire = Settings.Default.Repertoire;
+                _repositoryPath = Settings.Default.Repertoire;
                 _accronyme = Settings.Default.Accronyme;
                 _projetId = Settings.Default.ProjectId;
                 Write();
@@ -121,7 +111,7 @@ namespace PGM.GUI.ViewModel
                 var str = sr.ReadToEnd();
                 SettingsViewModel settings = JsonConvert.DeserializeObject<SettingsViewModel>(str);
                 _gitApiKey = settings._gitApiKey;
-                _repertoire = settings._repertoire;
+                _repositoryPath = settings._repositoryPath;
                 _accronyme = settings._accronyme;
                 _projetId = settings._projetId;
             }
@@ -130,7 +120,7 @@ namespace PGM.GUI.ViewModel
         }
 
         private string _gitApiKey;
-        private string _repertoire;
+        private string _repositoryPath;
         private string _accronyme;
         private string _projetId;
 
