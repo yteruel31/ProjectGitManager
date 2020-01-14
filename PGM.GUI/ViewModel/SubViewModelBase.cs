@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Messaging;
 
 namespace PGM.GUI.ViewModel
 {
@@ -31,20 +30,5 @@ namespace PGM.GUI.ViewModel
         }
 
         public bool IsLongActionRunning { get; set; }
-    }
-
-    public interface ISubViewModelBase
-    {
-        Task ExecuteLongActionAsync(Func<Task> asyncAction);
-    }
-
-    public class IsProcessingMessage : MessageBase
-    {
-        public IsProcessingMessage(bool isProcessing)
-        {
-            IsProcessing = isProcessing;
-        }
-
-        public bool IsProcessing { get; }
     }
 }
