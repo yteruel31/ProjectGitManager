@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -41,27 +42,49 @@ namespace PGM.GUI.ViewModel
 
         public ICommand ValidateActualBranchCommand { get; set; }
 
-        public ICommand ActivatedCommand =>
-            _activatedCommand ?? (_activatedCommand = CommandFactory.CreateAsync(Activated, CanActivate, nameof(ActivatedCommand), this));
+        public ICommand LaunchPgmCommand =>
+            _activatedCommand ?? (_activatedCommand = CommandFactory.CreateAsync(LaunchPgm, CanLaunchPgm, nameof(LaunchPgmCommand), this));
 
-        private bool CanActivate()
+        private bool CanLaunchPgm()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
-        private async Task Activated()
+        private async Task LaunchPgm()
         {
-            await LoadIssues(true);
+            if (string.IsNullOrEmpty(SettingsViewModel.RepositoryPath)
+                || !Directory.Exists(SettingsViewModel.RepositoryPath)
+                || string.IsNullOrEmpty(SettingsViewModel.GitApiKey)
+                || string.IsNullOrEmpty(SettingsViewModel.ProjectId))
+            {
+                return;
+            }
+
+            await LoadIssues();
+        }
+
+        private GitlabIssue _selectedIssue;
+
+        public GitlabIssue SelectedIssue
+        {
+            get { return _selectedIssue; }
+            set
+            {
+                if (_selectedIssue != value)
+                {
+                    Set(nameof(SelectedIssue), ref _selectedIssue, value);
+                }
+            }
         }
 
         public bool IsRefreshing { get; set; }
 
-        public async Task LoadIssues(bool refresh = false)
+        private async Task LoadIssues(bool refresh = false)
         {
             List<GitlabIssue> gitlabIssues = 
                 await await Task.Factory.StartNew(() => _gitlabService.GetAllIssuesOfCurrentSprint());
             
-            Application.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher?.Invoke(() =>
             {
                 bool previousIsRefreshing = IsRefreshing;
                 IsRefreshing = true;

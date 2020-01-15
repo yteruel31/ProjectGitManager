@@ -5,53 +5,96 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:I="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:ViewModel="clr-namespace:PGM.GUI.ViewModel"
+        xmlns:Model="clr-namespace:PGM.Lib.Model.Issues;assembly=PGM.Lib"
+        xmlns:View="clr-namespace:PGM.GUI.View"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance ViewModel:MainViewModel}"
-        Title="MainWindow" Height="450" Width="800">
+        Title="ProjectGitManager" Height="450" Width="800">
     <I:Interaction.Triggers>
         <I:EventTrigger EventName="Loaded">
-            <I:InvokeCommandAction Command="{Binding ActivatedCommand}" />
+            <I:InvokeCommandAction Command="{Binding LaunchPgmCommand}" />
         </I:EventTrigger>
         <I:EventTrigger EventName="Activated">
-            <I:InvokeCommandAction Command="{Binding ActivatedCommand}" />
+            <I:InvokeCommandAction Command="{Binding LaunchPgmCommand}" />
         </I:EventTrigger>
     </I:Interaction.Triggers>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition />
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                <Button 
-                    Command="{Binding CreateBranchLinkedWithIssueCommand}"
-                    Content="Create Branch" 
-                    ToolTip="Create branch linked with corresponding issue"/>
-                <Button 
-                    Command="{Binding CreateMergeRequestOnGitlabCommand}"
-                    Content="Merge Request"
-                    ToolTip="Create Merge Request on Gitlab"/>
-                <Button 
-                    Command="{Binding TestActualBranchCommand}"
-                    Content="Test Branch"
-                    ToolTip="Test Branch"/>
-                <Button 
-                    Command="{Binding ValidateActualBranchCommand}"
-                    Content="Validate" 
-                    ToolTip="Validate the implementation"/>
-            </StackPanel>
-        </Grid>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="400" MinWidth="100" />
-                <ColumnDefinition Width="100" />
-            </Grid.ColumnDefinitions>
-            <DockPanel Grid.Column="0">
-                <ListBox ItemsSource="{Binding GroupedIssues}">
-                    
-                </ListBox>
-            </DockPanel>
-        </Grid>
+        <TabControl>
+            <TabItem Header="ProjectGitManager">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <Button 
+                                Command="{Binding CreateBranchLinkedWithIssueCommand}"
+                                Content="Create Branch" 
+                                ToolTip="Create branch linked with corresponding issue"/>
+                            <Button 
+                                Command="{Binding CreateMergeRequestOnGitlabCommand}"
+                                Content="Merge Request"
+                                ToolTip="Create Merge Request on Gitlab"/>
+                            <Button 
+                                Command="{Binding TestActualBranchCommand}"
+                                Content="Test Branch"
+                                ToolTip="Test Branch"/>
+                            <Button 
+                                Command="{Binding ValidateActualBranchCommand}"
+                                Content="Validate" 
+                                ToolTip="Validate the implementation"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="400" MinWidth="100" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition MinWidth="100" />
+                        </Grid.ColumnDefinitions>
+                        <DockPanel Grid.Column="0">
+                            <ListBox 
+                                ItemsSource="{Binding GroupedIssues}" 
+                                SelectedItem="{Binding SelectedIssue}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="Model:GitlabIssue">
+                                        <TextBlock Text="{Binding Title}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
+                        <GridSplitter 
+                            Grid.Column="1" 
+                            Width="4" 
+                            ResizeDirection="Columns" 
+                            ResizeBehavior="PreviousAndCurrent"/>
+                        <View:IssueDetailControl Grid.Column="2"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Settings">
+                <Grid DataContext="{Binding SettingsViewModel}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="GitLab API Key" Margin="10" />
+                    <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding GitApiKey}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" Grid.Row="1" Text="Repository Path" Margin="10" />
+                    <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding RepositoryPath}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" Grid.Row="2" Text="Accronyme" Margin="10" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Accronyme}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" Grid.Row="3" Text="ID of Gitlab Project" Margin="10" />
+                    <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding ProjectId}" VerticalAlignment="Center" />
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
