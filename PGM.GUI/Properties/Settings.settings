@@ -8,10 +8,13 @@
     <Setting Name="Repertoire" Type="System.String" Scope="User">
       <Value Profile="(Default)">na</Value>
     </Setting>
-    <Setting Name="Accronyme" Type="System.String" Scope="User">
+    <Setting Name="UserName" Type="System.String" Scope="User">
       <Value Profile="(Default)">na</Value>
     </Setting>
     <Setting Name="ProjectId" Type="System.String" Scope="User">
+      <Value Profile="(Default)">na</Value>
+    </Setting>
+    <Setting Name="Email" Type="System.String" Scope="User">
       <Value Profile="(Default)">na</Value>
     </Setting>
   </Settings>

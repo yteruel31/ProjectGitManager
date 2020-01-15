@@ -50,12 +50,12 @@ namespace PGM.GUI.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("na")]
-        public string Accronyme {
+        public string UserName {
             get {
-                return ((string)(this["Accronyme"]));
+                return ((string)(this["UserName"]));
             }
             set {
-                this["Accronyme"] = value;
+                this["UserName"] = value;
             }
         }
         
@@ -68,6 +68,18 @@ namespace PGM.GUI.Properties {
             }
             set {
                 this["ProjectId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("na")]
+        public string Email {
+            get {
+                return ((string)(this["Email"]));
+            }
+            set {
+                this["Email"] = value;
             }
         }
     }

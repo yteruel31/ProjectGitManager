@@ -7,7 +7,9 @@ namespace PGM.Lib.Model
 
         string RepositoryPath { get; }
 
-        string Accronyme { get; }
+        string FullName { get; }
+
+        string Email { get; }
 
         string ProjectId { get; }
     }

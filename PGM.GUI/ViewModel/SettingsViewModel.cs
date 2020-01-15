@@ -45,21 +45,34 @@ namespace PGM.GUI.ViewModel
             }
         }
 
-        public string Accronyme
+        public string FullName
         {
             get
             {
-                if (string.IsNullOrEmpty(_accronyme))
+                if (string.IsNullOrEmpty(_fullName))
                 {
                     Read();
                 }
 
-                return _accronyme;
+                return _fullName;
             }
             set
             {
-                _accronyme = value;
+                _fullName = value;
                 Write();
+            }
+        }
+
+        public string Email
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_email))
+                {
+                    Read();
+                }
+
+                return _email;
             }
         }
 
@@ -99,7 +112,8 @@ namespace PGM.GUI.ViewModel
             {
                 _gitApiKey = Settings.Default.GitApiKey;
                 _repositoryPath = Settings.Default.Repertoire;
-                _accronyme = Settings.Default.Accronyme;
+                _fullName = Settings.Default.UserName;
+                _email = Settings.Default.Email;
                 _projetId = Settings.Default.ProjectId;
                 Write();
                 _isRead = true;
@@ -108,11 +122,12 @@ namespace PGM.GUI.ViewModel
 
             using (StreamReader sr = new StreamReader(path))
             {
-                var str = sr.ReadToEnd();
+                string str = sr.ReadToEnd();
                 SettingsViewModel settings = JsonConvert.DeserializeObject<SettingsViewModel>(str);
                 _gitApiKey = settings._gitApiKey;
                 _repositoryPath = settings._repositoryPath;
-                _accronyme = settings._accronyme;
+                _fullName = settings._fullName;
+                _email = settings._email;
                 _projetId = settings._projetId;
             }
 
@@ -121,8 +136,9 @@ namespace PGM.GUI.ViewModel
 
         private string _gitApiKey;
         private string _repositoryPath;
-        private string _accronyme;
+        private string _fullName;
         private string _projetId;
+        private string _email;
 
         private void Write()
         {
@@ -137,10 +153,8 @@ namespace PGM.GUI.ViewModel
             }
 
             string str = JsonConvert.SerializeObject(this);
-            using (StreamWriter sw = new StreamWriter(GetSettingsPath()))
-            {
-                sw.Write(str);
-            }
+            using StreamWriter sw = new StreamWriter(GetSettingsPath());
+            sw.Write(str);
         }
 
     }

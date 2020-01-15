@@ -89,8 +89,10 @@
                     <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding GitApiKey}" VerticalAlignment="Center" />
                     <TextBlock Grid.Column="0" Grid.Row="1" Text="Repository Path" Margin="10" />
                     <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding RepositoryPath}" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="0" Grid.Row="2" Text="Accronyme" Margin="10" />
-                    <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Accronyme}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" Grid.Row="2" Text="UserName" Margin="10" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding FullName}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" Grid.Row="2" Text="Email" Margin="10" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Email}" VerticalAlignment="Center" />
                     <TextBlock Grid.Column="0" Grid.Row="3" Text="ID of Gitlab Project" Margin="10" />
                     <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding ProjectId}" VerticalAlignment="Center" />
                 </Grid>

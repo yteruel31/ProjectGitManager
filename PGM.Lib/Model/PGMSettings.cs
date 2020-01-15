@@ -11,8 +11,13 @@ namespace PGM.Lib.Model
         }
 
         public string GitApiKey => _pgmSettings.GitApiKey;
+
         public string RepositoryPath => _pgmSettings.RepositoryPath;
-        public string Accronyme => _pgmSettings.Accronyme;
+
+        public string FullName => _pgmSettings.FullName;
+
+        public string Email => _pgmSettings.Email;
+
         public string ProjectId => _pgmSettings.ProjectId;
     }
 }
