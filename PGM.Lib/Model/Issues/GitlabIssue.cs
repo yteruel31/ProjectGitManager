@@ -6,6 +6,8 @@ namespace PGM.Lib.Model.Issues
     {
         public int Id { get; set; }
 
+        public string Title { get; set; }
+
         public string Description { get; set; }
 
         public GitlabMilestone GitlabMilestone { get; set; }
@@ -14,5 +16,4 @@ namespace PGM.Lib.Model.Issues
 
         public StepType StepType { get; set; }
     }
-
 }

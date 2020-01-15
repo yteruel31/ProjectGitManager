@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GitLabApiClient;
 using GitLabApiClient.Models.Issues.Responses;
-using GitLabApiClient.Models.MergeRequests.Requests;
 using GitLabApiClient.Models.Projects.Responses;
 using PGM.Lib.Model;
 using PGM.Lib.Model.Issues;
@@ -12,21 +11,20 @@ namespace PGM.Lib
 {
     public class GitlabService
     {
-        private readonly GitLabClient _client;
-        private readonly IPGMSettings _settings;
+        private readonly IGitlabClientRepository _gitlabClientRepository;
 
         public GitlabService(IPGMSettings settings)
         {
-            _settings = settings;
-            _client = new GitLabClient("https://gitlab.com/", _settings.GitApiKey);
+            _gitlabClientRepository = new GitlabClientRepository(settings);
         }
 
         public async Task<List<GitlabIssue>> GetAllIssuesOfCurrentSprint()
         {
             IList<Issue> issueResult;
+
             try
             {
-                issueResult = await _client.Issues.GetAsync(_settings.ProjectId);
+                issueResult = await _gitlabClientRepository.GetIssuesFromCurrentProject();
             }
             catch (GitLabException)
             {
@@ -34,25 +32,23 @@ namespace PGM.Lib
             }
 
             List<GitlabIssue> gitlabIssues = new List<GitlabIssue>();
-            
+
             foreach (Issue issue in issueResult)
             {
-                GitlabIssue gitlabIssue = GetGitlabIssue(issue);
-
-                if (gitlabIssue.GitlabMilestone.Id != issue.Milestone.Id)
+                if (issue.Milestone != null)
                 {
-                    continue;
+                    GitlabIssue gitlabIssue = GetGitlabIssue(issue);
+
+                    if (gitlabIssue.GitlabMilestone.Id != issue.Milestone.Id)
+                    {
+                        continue;
+                    }
+
+                    gitlabIssues.Add(gitlabIssue);
                 }
-                
-                gitlabIssues.Add(gitlabIssue);
             }
 
             return gitlabIssues;
-        }
-
-        public void PostMergeRequest(string branche, string mrTitle)
-        {
-            _client.MergeRequests.CreateAsync(_settings.ProjectId, GetMergeRequestInfo(branche, mrTitle));
         }
 
         private GitlabIssue GetGitlabIssue(Issue issue)
@@ -60,6 +56,7 @@ namespace PGM.Lib
             return new GitlabIssue()
             {
                 Id = issue.Id,
+                Title = issue.Title,
                 Description = issue.Description,
                 GitlabMilestone = new GitlabMilestone()
                 {
@@ -86,7 +83,7 @@ namespace PGM.Lib
 
             try
             {
-                labelsResult = await _client.Projects.GetLabelsAsync(_settings.ProjectId);
+                labelsResult = await _gitlabClientRepository.GetLabelsFromCurrentProject();
             }
             catch (GitLabException)
             {
@@ -110,11 +107,6 @@ namespace PGM.Lib
         private IEnumerable<Label> GetLabelsFromCurrentIssue(IList<Label> labelsResult, Issue currentIssue)
         {
             return labelsResult.Where(l => currentIssue.Labels.Contains(l.Name));
-        }
-
-        private CreateMergeRequest GetMergeRequestInfo(string sourceBranch, string mrTitle)
-        {
-            return new CreateMergeRequest(sourceBranch, "master", mrTitle);
         }
     }
 }
