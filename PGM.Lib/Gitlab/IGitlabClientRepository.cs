@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 
-namespace PGM.Lib
+namespace PGM.Lib.Gitlab
 {
     public interface IGitlabClientRepository
     {

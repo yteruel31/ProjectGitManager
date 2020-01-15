@@ -9,7 +9,7 @@ using GitLabApiClient.Models.Milestones.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 using PGM.Lib.Model;
 
-namespace PGM.Lib
+namespace PGM.Lib.Gitlab
 {
     public class GitlabClientRepository : IGitlabClientRepository
     {

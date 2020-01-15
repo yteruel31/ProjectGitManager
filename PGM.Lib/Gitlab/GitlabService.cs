@@ -7,9 +7,9 @@ using GitLabApiClient.Models.Projects.Responses;
 using PGM.Lib.Model;
 using PGM.Lib.Model.Issues;
 
-namespace PGM.Lib
+namespace PGM.Lib.Gitlab
 {
-    public class GitlabService
+    public class GitlabService : IGitlabService
     {
         private readonly IGitlabClientRepository _gitlabClientRepository;
 
@@ -108,5 +108,10 @@ namespace PGM.Lib
         {
             return labelsResult.Where(l => currentIssue.Labels.Contains(l.Name));
         }
+    }
+
+    public interface IGitlabService
+    {
+        Task<List<GitlabIssue>> GetAllIssuesOfCurrentSprint();
     }
 }
