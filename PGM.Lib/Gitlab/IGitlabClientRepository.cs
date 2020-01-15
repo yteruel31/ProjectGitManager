@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using GitLabApiClient.Models;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 
@@ -12,5 +13,7 @@ namespace PGM.Lib.Gitlab
         Task<IList<Issue>> GetIssuesFromCurrentProject();
 
         Task<IList<Label>> GetLabelsFromCurrentProject();
+
+        Task<Assignee> GetAssigneeFromCurrentUser();
     }
 }

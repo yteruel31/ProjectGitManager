@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PGM.Lib.Model.Issues
 {
@@ -14,6 +15,23 @@ namespace PGM.Lib.Model.Issues
         
         public List<GitlabLabel> Labels { get; set; }
 
+        public List<GitlabAssignee> Assignees { get; set; }
+
         public StepType StepType { get; set; }
+    }
+
+    public class GitlabAssignee
+    {
+        public int Id { get; set; }
+
+        public string State { get; set; }
+
+        public string AvatarUrl { get; set; }
+
+        public string Name { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public string Username { get; set; }
     }
 }

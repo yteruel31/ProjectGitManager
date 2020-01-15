@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GitLabApiClient;
+using GitLabApiClient.Models;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 using PGM.Lib.Model;
@@ -62,8 +63,22 @@ namespace PGM.Lib.Gitlab
                 {
                     Id = issue.Milestone.Id,
                     Title = issue.Milestone.Title
-                }
+                },
+                Assignees = GetGitlabAssignees(issue.Assignees)
             };
+        }
+
+        private List<GitlabAssignee> GetGitlabAssignees(List<Assignee> assignees)
+        {
+            return assignees.Select(assignee => new GitlabAssignee
+                {
+                    Id = assignee.Id,
+                    State = assignee.State,
+                    Name = assignee.Name,
+                    Username = assignee.Username,
+                    CreatedAt = assignee.CreatedAt,
+                    AvatarUrl = assignee.AvatarUrl
+                }).ToList();
         }
 
         private GitlabLabel GetGitlabLabel(Label label)
@@ -108,10 +123,18 @@ namespace PGM.Lib.Gitlab
         {
             return labelsResult.Where(l => currentIssue.Labels.Contains(l.Name));
         }
+
+        public async Task SetAssigneeOnCurrentIssue(GitlabIssue issue)
+        {
+            Assignee assignee = await _gitlabClientRepository.GetAssigneeFromCurrentUser();
+            issue.Assignees.Add(assignee.ToGitLabAssignee());
+        }
     }
 
     public interface IGitlabService
     {
         Task<List<GitlabIssue>> GetAllIssuesOfCurrentSprint();
+
+        Task SetAssigneeOnCurrentIssue(GitlabIssue issue);
     }
 }
