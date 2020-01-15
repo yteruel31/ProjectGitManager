@@ -74,6 +74,11 @@ namespace PGM.GUI.ViewModel
 
                 return _email;
             }
+            set
+            {
+                _email = value;
+                Write();
+            }
         }
 
         public string ProjectId {
