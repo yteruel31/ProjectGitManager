@@ -4,13 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using GitLabApiClient;
 using GitLabApiClient.Models;
-using GitLabApiClient.Models.Issues.Requests;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.MergeRequests.Requests;
 using GitLabApiClient.Models.Milestones.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 using GitLabApiClient.Models.Users.Responses;
-using PGM.Lib.Model;
+using PGM.Lib.Utilities;
 
 namespace PGM.Lib.Gitlab
 {

@@ -1,5 +1,5 @@
 ﻿using GitLabApiClient.Models;
-using PGM.Lib.Model.Issues;
+using PGM.Lib.Model;
 
 namespace PGM.Lib.Gitlab
 {

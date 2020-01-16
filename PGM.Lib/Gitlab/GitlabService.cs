@@ -6,7 +6,7 @@ using GitLabApiClient.Models;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 using PGM.Lib.Model;
-using PGM.Lib.Model.Issues;
+using PGM.Lib.Utilities;
 
 namespace PGM.Lib.Gitlab
 {

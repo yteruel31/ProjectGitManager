@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -7,10 +6,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using PGM.GUI.AutoMapper;
 using PGM.GUI.Utilities;
 using PGM.Lib.Gitlab;
 using PGM.Lib.Model;
-using PGM.Lib.Model.Issues;
+using PGM.Lib.Utilities;
+
 // ReSharper disable ConvertToNullCoalescingCompoundAssignment
 
 namespace PGM.GUI.ViewModel
@@ -19,16 +20,20 @@ namespace PGM.GUI.ViewModel
     {
         private readonly GitlabService _gitlabService;
         private ICommand _activatedCommand;
+        private IMapperVoToModel _mapperVoToModel;
+        private GitlabIssue _selectedIssue;
+        private PGMSettingsVO _pgmSettingsVo;
+        private IPGMSettings _pgmSettings;
 
-        public MainViewModel()
+        public MainViewModel(IPGMSettings pgmSettings, IMapperVoToModel mapperVoToModel)
         {
+            _pgmSettings = pgmSettings;
+            _mapperVoToModel = mapperVoToModel;
             GitlabIssues = new ObservableCollection<GitlabIssue>();
             GroupedIssues = CollectionViewSource.GetDefaultView(GitlabIssues);
             GroupedIssues.GroupDescriptions.Add(new PropertyGroupDescription(nameof(GitlabIssue.StepType)));
-            _gitlabService = new GitlabService(new PGMSettings(SettingsViewModel));
+            _gitlabService = new GitlabService(pgmSettings);
         }
-
-        public SettingsViewModel SettingsViewModel { get; } = new SettingsViewModel();
 
         public ICollectionView GroupedIssues { get; set; }
 
@@ -50,20 +55,33 @@ namespace PGM.GUI.ViewModel
             return true;
         }
 
+        public PGMSettingsVO PgmSettingsVo
+        {
+            get { return _pgmSettingsVo; }
+
+            set
+            {
+                if (_pgmSettingsVo != value)
+                {
+                    Set(nameof(PgmSettingsVo), ref _pgmSettingsVo, value);
+                }
+            }
+        }
+
         private async Task LaunchPgm()
         {
-            if (string.IsNullOrEmpty(SettingsViewModel.RepositoryPath)
-                || !Directory.Exists(SettingsViewModel.RepositoryPath)
-                || string.IsNullOrEmpty(SettingsViewModel.GitApiKey)
-                || string.IsNullOrEmpty(SettingsViewModel.ProjectId))
+            PgmSettingsVo = _mapperVoToModel.GetPgmSettingsVo(_pgmSettings.GetPGMSettings);
+
+            if (string.IsNullOrEmpty(_pgmSettingsVo.RepositoryPath)
+                || !Directory.Exists(_pgmSettingsVo.RepositoryPath)
+                || string.IsNullOrEmpty(_pgmSettingsVo.GitApiKey)
+                || string.IsNullOrEmpty(_pgmSettingsVo.ProjectId))
             {
                 return;
             }
 
             await LoadIssues();
         }
-
-        private GitlabIssue _selectedIssue;
 
         public GitlabIssue SelectedIssue
         {
@@ -93,7 +111,7 @@ namespace PGM.GUI.ViewModel
                     GitlabIssues.Clear();
                 }
 
-                if (!string.IsNullOrEmpty(SettingsViewModel.GitApiKey))
+                if (!string.IsNullOrEmpty(_pgmSettingsVo.GitApiKey))
                 {
                     foreach (GitlabIssue gitlabIssue in gitlabIssues)
                     {

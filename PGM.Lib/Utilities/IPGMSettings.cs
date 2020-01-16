@@ -1,5 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace PGM.Lib.Model
+namespace PGM.Lib.Utilities
 {
     public interface IPGMSettings
     {
@@ -12,5 +12,7 @@ namespace PGM.Lib.Model
         string Email { get; }
 
         string ProjectId { get; }
+
+        PGMSettings GetPGMSettings { get; }
     }
 }

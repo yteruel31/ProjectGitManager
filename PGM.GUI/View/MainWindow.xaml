@@ -1,4 +1,4 @@
-<Window x:Class="PGM.GUI.View.MainWindow"
+﻿<Window x:Class="PGM.GUI.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -60,7 +60,7 @@
                                 ItemsSource="{Binding GroupedIssues}" 
                                 SelectedItem="{Binding SelectedIssue}">
                                 <ListBox.ItemTemplate>
-                                    <DataTemplate DataType="Model:GitlabIssue">
+                                    <DataTemplate DataType="ModelIssue:GitlabIssue">
                                         <TextBlock Text="{Binding Title}"/>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -76,7 +76,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Settings">
-                <Grid DataContext="{Binding SettingsViewModel}">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition />
@@ -89,15 +89,15 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Column="0" Grid.Row="0" Text="GitLab API Key" Margin="10" />
-                    <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding GitApiKey}" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding PgmSettingsVo.GitApiKey}" VerticalAlignment="Center" />
                     <TextBlock Grid.Column="0" Grid.Row="1" Text="Repository Path" Margin="10" />
-                    <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding RepositoryPath}" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding PgmSettingsVo.RepositoryPath}" VerticalAlignment="Center" />
                     <TextBlock Grid.Column="0" Grid.Row="2" Text="UserName" Margin="10" />
-                    <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding FullName}" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding PgmSettingsVo.FullName}" VerticalAlignment="Center" />
                     <TextBlock Grid.Column="0" Grid.Row="3" Text="Email" Margin="10" />
-                    <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding Email}" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding PgmSettingsVo.Email}" VerticalAlignment="Center" />
                     <TextBlock Grid.Column="0" Grid.Row="4" Text="ID of Gitlab Project" Margin="10" />
-                    <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding ProjectId}" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding PgmSettingsVo.ProjectId}" VerticalAlignment="Center" />
                 </Grid>
             </TabItem>
         </TabControl>

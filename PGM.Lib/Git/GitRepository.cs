@@ -1,6 +1,6 @@
 ﻿using System;
 using LibGit2Sharp;
-using PGM.Lib.Model;
+using PGM.Lib.Utilities;
 
 namespace PGM.Lib.Git
 {

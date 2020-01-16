@@ -1,4 +1,4 @@
-﻿namespace PGM.Lib.Model.Issues
+﻿namespace PGM.Lib.Model
 {
     public class GitlabLabel
     {

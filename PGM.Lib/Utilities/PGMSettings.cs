@@ -1,14 +1,18 @@
 ﻿using System;
 using System.IO;
-using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
-using PGM.GUI.Properties;
-using PGM.Lib.Model;
 
-namespace PGM.GUI.ViewModel
+namespace PGM.Lib.Utilities
 {
-    public class SettingsViewModel : ObservableObject, IPGMSettings
+    public class PGMSettings : IPGMSettings
     {
+        private string _gitApiKey;
+        private string _repositoryPath;
+        private string _fullName;
+        private string _projetId;
+        private string _email;
+        private bool _isRead;
+
         public string GitApiKey
         {
             get
@@ -108,18 +112,16 @@ namespace PGM.GUI.ViewModel
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PGM");
         }
 
-        private bool _isRead;
-
         private void Read()
         {
             string path = GetSettingsPath();
             if (!File.Exists(path))
             {
-                _gitApiKey = Settings.Default.GitApiKey;
-                _repositoryPath = Settings.Default.Repertoire;
-                _fullName = Settings.Default.UserName;
-                _email = Settings.Default.Email;
-                _projetId = Settings.Default.ProjectId;
+                _gitApiKey = "NA";
+                _repositoryPath = "NA";
+                _fullName = "NA";
+                _email = "NA";
+                _projetId = "NA";
                 Write();
                 _isRead = true;
                 return;
@@ -128,7 +130,7 @@ namespace PGM.GUI.ViewModel
             using (StreamReader sr = new StreamReader(path))
             {
                 string str = sr.ReadToEnd();
-                SettingsViewModel settings = JsonConvert.DeserializeObject<SettingsViewModel>(str);
+                PGMSettings settings = JsonConvert.DeserializeObject<PGMSettings>(str);
                 _gitApiKey = settings._gitApiKey;
                 _repositoryPath = settings._repositoryPath;
                 _fullName = settings._fullName;
@@ -139,11 +141,7 @@ namespace PGM.GUI.ViewModel
             _isRead = true;
         }
 
-        private string _gitApiKey;
-        private string _repositoryPath;
-        private string _fullName;
-        private string _projetId;
-        private string _email;
+        public PGMSettings GetPGMSettings => this;
 
         private void Write()
         {
@@ -161,6 +159,5 @@ namespace PGM.GUI.ViewModel
             using StreamWriter sw = new StreamWriter(GetSettingsPath());
             sw.Write(str);
         }
-
     }
 }

@@ -1,6 +1,6 @@
 ﻿using PGM.Lib.Gitlab;
 using PGM.Lib.Model;
-using PGM.Lib.Model.Issues;
+using PGM.Lib.Utilities;
 
 namespace PGM.Lib.Git
 {

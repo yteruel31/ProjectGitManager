@@ -1,4 +1,4 @@
-﻿using PGM.Lib.Model.Issues;
+﻿using PGM.Lib.Model;
 
 namespace PGM.Lib.Git
 {
