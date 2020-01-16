@@ -1,15 +1,17 @@
-﻿<Window x:Class="PGM.GUI.View.MainWindow"
+<Window x:Class="PGM.GUI.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:I="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:ViewModel="clr-namespace:PGM.GUI.ViewModel"
-        xmlns:Model="clr-namespace:PGM.Lib.Model.Issues;assembly=PGM.Lib"
+        xmlns:ModelIssue="clr-namespace:PGM.Lib.Model;assembly=PGM.Lib"
+        xmlns:Utilities="clr-namespace:PGM.GUI.Utilities"
         xmlns:View="clr-namespace:PGM.GUI.View"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance ViewModel:MainViewModel}"
         Title="ProjectGitManager" Height="450" Width="800">
+    <Window.DataContext>
+        <Binding Source="{StaticResource Locator}" Path="MainPgm"/>
+    </Window.DataContext>
     <I:Interaction.Triggers>
         <I:EventTrigger EventName="Loaded">
             <I:InvokeCommandAction Command="{Binding LaunchPgmCommand}" />

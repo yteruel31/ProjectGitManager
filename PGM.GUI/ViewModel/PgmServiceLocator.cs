@@ -1,0 +1,72 @@
+﻿using System.Reflection;
+using Autofac;
+using Autofac.Extras.CommonServiceLocator;
+using CommonServiceLocator;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Messaging;
+using PGM.GUI.AutoMapper;
+using PGM.GUI.View;
+using PGM.Lib;
+using PGM.Lib.Utilities;
+using IContainer = Autofac.IContainer;
+
+namespace PGM.GUI.ViewModel
+{
+    public class PgmServiceLocator
+    {
+        private static AutofacServiceLocator _autofacServiceLocator;
+        private static IContainer _container;
+        private static ILifetimeScope _currentScope;
+        private static bool _isServiceLocatorSet;
+
+        public static IServiceLocator Current => _isServiceLocatorSet ? ServiceLocator.Current : null;
+        
+        public static void Reset()
+        {
+            _currentScope?.Dispose();
+            InitServiceLocator();
+        }
+
+        public static void Initialise()
+        {
+            Reset();
+        }
+
+        private static void InitServiceLocator()
+        {
+            if (_autofacServiceLocator == null)
+            {
+                ContainerBuilder containerBuilder = new ContainerBuilder();
+                InitContainer(containerBuilder);
+                _container = containerBuilder.Build();
+            }
+
+            Messenger.Reset();
+
+            _currentScope = _container.BeginLifetimeScope();
+            _autofacServiceLocator = new AutofacServiceLocator(_currentScope);
+            _isServiceLocatorSet = true;
+            ServiceLocator.SetLocatorProvider(() => _autofacServiceLocator);
+        }
+
+        private static void InitContainer(ContainerBuilder containerBuilder)
+        {
+            Assembly assembly = typeof(PgmServiceLocator).Assembly;
+
+            containerBuilder.RegisterAssemblyTypes(assembly)
+                .AssignableTo<ViewModelBase>()
+                .InstancePerLifetimeScope();
+
+            containerBuilder.RegisterType<MapperVoToModel>().As<IMapperVoToModel>();
+
+            containerBuilder.RegisterType<MainWindow>();
+
+            containerBuilder.RegisterType<ViewModelLocator>();
+
+            containerBuilder.RegisterModule<LibAutofacModule>();
+
+            containerBuilder.RegisterType<PGMSettings>()
+                .As<IPGMSettings>();
+        }
+    }
+}
