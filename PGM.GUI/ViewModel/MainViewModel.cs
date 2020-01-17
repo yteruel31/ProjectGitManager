@@ -18,26 +18,29 @@ namespace PGM.GUI.ViewModel
 {
     public class MainViewModel : SubViewModelBase
     {
-        private readonly GitlabService _gitlabService;
+        private readonly IGitlabService _gitlabService;
+        private readonly IPGMSettings _pgmSettings;
+        private readonly IMapperVoToModel _mapperVoToModel;
         private ICommand _activatedCommand;
-        private IMapperVoToModel _mapperVoToModel;
         private GitlabIssue _selectedIssue;
         private PGMSettingsVO _pgmSettingsVo;
-        private IPGMSettings _pgmSettings;
 
-        public MainViewModel(IPGMSettings pgmSettings, IMapperVoToModel mapperVoToModel)
+        public MainViewModel(IPGMSettings pgmSettings, IMapperVoToModel mapperVoToModel, IGitlabService gitlabService)
         {
             _pgmSettings = pgmSettings;
             _mapperVoToModel = mapperVoToModel;
-            GitlabIssues = new ObservableCollection<GitlabIssue>();
-            GroupedIssues = CollectionViewSource.GetDefaultView(GitlabIssues);
             GroupedIssues.GroupDescriptions.Add(new PropertyGroupDescription(nameof(GitlabIssue.StepType)));
-            _gitlabService = new GitlabService(pgmSettings);
+            _gitlabService = gitlabService;
         }
 
-        public ICollectionView GroupedIssues { get; set; }
+        public ICollectionView GroupedIssues
+        {
+            get { return CollectionViewSource.GetDefaultView(GitlabIssues); }
+        }
 
-        public ObservableCollection<GitlabIssue> GitlabIssues { get; set; }
+        public bool IsRefreshing { get; set; }
+
+        public ObservableCollection<GitlabIssue> GitlabIssues { get; set; } = new ObservableCollection<GitlabIssue>();
 
         public ICommand CreateBranchLinkedWithIssueCommand { get; set; }
 
@@ -94,8 +97,6 @@ namespace PGM.GUI.ViewModel
                 }
             }
         }
-
-        public bool IsRefreshing { get; set; }
 
         private async Task LoadIssues(bool refresh = false)
         {
