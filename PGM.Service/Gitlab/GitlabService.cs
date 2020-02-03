@@ -5,10 +5,10 @@ using GitLabApiClient;
 using GitLabApiClient.Models;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.Projects.Responses;
-using PGM.Lib.Model;
-using PGM.Lib.Utilities;
+using PGM.Model;
+using PGM.Service.Utilities;
 
-namespace PGM.Lib.Gitlab
+namespace PGM.Service.Gitlab
 {
     public class GitlabService : IGitlabService
     {

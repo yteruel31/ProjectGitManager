@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using Module = Autofac.Module;
 
-namespace PGM.Lib
+namespace PGM.Service
 {
     public class LibAutofacModule : Module
     {

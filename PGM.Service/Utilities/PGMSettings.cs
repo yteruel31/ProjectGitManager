@@ -2,7 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace PGM.Lib.Utilities
+namespace PGM.Service.Utilities
 {
     public class PGMSettings : IPGMSettings
     {
@@ -156,8 +156,11 @@ namespace PGM.Lib.Utilities
             }
 
             string str = JsonConvert.SerializeObject(this);
-            using StreamWriter sw = new StreamWriter(GetSettingsPath());
-            sw.Write(str);
+
+            using (StreamWriter sw = new StreamWriter(GetSettingsPath()))
+            {
+                sw.Write(str);
+            }
         }
     }
 }

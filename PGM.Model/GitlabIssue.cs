@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PGM.Lib.Model
+namespace PGM.Model
 {
     public class GitlabIssue
     {

@@ -1,5 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace PGM.Lib.Utilities
+namespace PGM.Service.Utilities
 {
     public interface IPGMSettings
     {

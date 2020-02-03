@@ -9,9 +9,9 @@ using GitLabApiClient.Models.MergeRequests.Requests;
 using GitLabApiClient.Models.Milestones.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 using GitLabApiClient.Models.Users.Responses;
-using PGM.Lib.Utilities;
+using PGM.Service.Utilities;
 
-namespace PGM.Lib.Gitlab
+namespace PGM.Service.Gitlab
 {
     public class GitlabClientRepository : IGitlabClientRepository
     {

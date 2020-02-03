@@ -4,7 +4,7 @@ using GitLabApiClient.Models;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 
-namespace PGM.Lib.Gitlab
+namespace PGM.Service.Gitlab
 {
     public interface IGitlabClientRepository
     {

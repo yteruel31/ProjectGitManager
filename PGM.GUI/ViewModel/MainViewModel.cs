@@ -8,9 +8,9 @@ using System.Windows.Data;
 using System.Windows.Input;
 using PGM.GUI.AutoMapper;
 using PGM.GUI.Utilities;
-using PGM.Lib.Gitlab;
-using PGM.Lib.Model;
-using PGM.Lib.Utilities;
+using PGM.Service.Gitlab;
+using PGM.Model;
+using PGM.Service.Utilities;
 
 // ReSharper disable ConvertToNullCoalescingCompoundAssignment
 

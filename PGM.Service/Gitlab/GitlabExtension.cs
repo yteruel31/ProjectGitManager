@@ -1,7 +1,7 @@
 ﻿using GitLabApiClient.Models;
-using PGM.Lib.Model;
+using PGM.Model;
 
-namespace PGM.Lib.Gitlab
+namespace PGM.Service.Gitlab
 {
     public static class GitlabExtension
     {

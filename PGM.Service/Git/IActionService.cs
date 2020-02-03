@@ -1,6 +1,6 @@
-﻿using PGM.Lib.Model;
+﻿using PGM.Model;
 
-namespace PGM.Lib.Git
+namespace PGM.Service.Git
 {
     public interface IActionService
     {

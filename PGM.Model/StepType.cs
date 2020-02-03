@@ -1,4 +1,4 @@
-﻿namespace PGM.Lib.Model
+﻿namespace PGM.Model
 {
     public enum StepType
     {

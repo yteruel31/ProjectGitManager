@@ -1,6 +1,6 @@
 ﻿using LibGit2Sharp;
 
-namespace PGM.Lib.Git
+namespace PGM.Service.Git
 {
     public class GitResult<T>
     {

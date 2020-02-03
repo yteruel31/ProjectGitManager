@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using PGM.GUI.ViewModel;
-using PGM.Lib.Utilities;
+using PGM.Service.Utilities;
 
 namespace PGM.GUI.AutoMapper
 {

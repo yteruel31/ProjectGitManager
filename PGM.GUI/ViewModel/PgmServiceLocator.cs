@@ -6,8 +6,8 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
 using PGM.GUI.AutoMapper;
 using PGM.GUI.View;
-using PGM.Lib;
-using PGM.Lib.Utilities;
+using PGM.Service;
+using PGM.Service.Utilities;
 using IContainer = Autofac.IContainer;
 
 namespace PGM.GUI.ViewModel

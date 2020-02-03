@@ -1,8 +1,8 @@
 ﻿using System;
 using LibGit2Sharp;
-using PGM.Lib.Utilities;
+using PGM.Service.Utilities;
 
-namespace PGM.Lib.Git
+namespace PGM.Service.Git
 {
     public class GitRepository : IGitRepository
     {

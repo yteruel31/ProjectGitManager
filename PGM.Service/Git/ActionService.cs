@@ -1,8 +1,8 @@
-﻿using PGM.Lib.Gitlab;
-using PGM.Lib.Model;
-using PGM.Lib.Utilities;
+﻿using PGM.Model;
+using PGM.Service.Gitlab;
+using PGM.Service.Utilities;
 
-namespace PGM.Lib.Git
+namespace PGM.Service.Git
 {
     public class ActionService : IActionService
     {

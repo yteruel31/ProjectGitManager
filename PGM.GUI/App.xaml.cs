@@ -1,5 +1,10 @@
-﻿using System.Windows;
-using PGM.GUI.ViewModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace PGM.GUI
 {
@@ -8,10 +13,5 @@ namespace PGM.GUI
     /// </summary>
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            PgmServiceLocator.Initialise();
-            base.OnStartup(e);
-        }
     }
 }

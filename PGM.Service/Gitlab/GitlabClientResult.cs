@@ -1,4 +1,4 @@
-﻿namespace PGM.Lib.Gitlab
+﻿namespace PGM.Service.Gitlab
 {
     public class GitlabClientResult
     {
