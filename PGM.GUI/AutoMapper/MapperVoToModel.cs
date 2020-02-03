@@ -13,6 +13,15 @@ namespace PGM.GUI.AutoMapper
             MapperConfiguration config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<PGMSettings, PGMSettingsVO>();
+                cfg.CreateMap<PGMSettingsVO, PGMSettings>()
+                    .AfterMap((vo, settings) =>
+                    {
+                        settings.Email = vo.Email;
+                        settings.FullName = vo.FullName;
+                        settings.GitApiKey = vo.GitApiKey;
+                        settings.ProjectId = vo.ProjectId;
+                        settings.RepositoryPath = vo.RepositoryPath;
+                    });
             });
             _mapper = config.CreateMapper();
         }

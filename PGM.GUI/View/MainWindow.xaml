@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:I="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:View="clr-namespace:PGM.GUI.View"
         xmlns:model="clr-namespace:PGM.Model;assembly=PGM.Model"
+        xmlns:view="clr-namespace:PGM.GUI.View"
         mc:Ignorable="d"
         Title="ProjectGitManager" Height="450" Width="800">
     <Window.DataContext>
@@ -70,7 +70,7 @@
                             Width="4" 
                             ResizeDirection="Columns" 
                             ResizeBehavior="PreviousAndCurrent"/>
-                        <View:IssueDetailControl Grid.Column="2"/>
+                        <view:IssueDetailControl Grid.Column="2"/>
                     </Grid>
                 </Grid>
             </TabItem>

@@ -63,7 +63,7 @@ namespace PGM.GUI.ViewModel
 
             containerBuilder.RegisterType<ViewModelLocator>();
 
-            containerBuilder.RegisterModule<LibAutofacModule>();
+            containerBuilder.RegisterModule<ServiceAutofacModule>();
 
             containerBuilder.RegisterType<PGMSettings>()
                 .As<IPGMSettings>();

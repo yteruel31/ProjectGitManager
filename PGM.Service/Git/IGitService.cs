@@ -2,7 +2,7 @@
 
 namespace PGM.Service.Git
 {
-    public interface IActionService
+    public interface IGitService
     {
         void CreateBranchLinkedWithIssue(GitlabIssue issue);
 

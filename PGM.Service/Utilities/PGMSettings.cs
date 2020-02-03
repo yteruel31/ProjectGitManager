@@ -117,11 +117,11 @@ namespace PGM.Service.Utilities
             string path = GetSettingsPath();
             if (!File.Exists(path))
             {
-                _gitApiKey = "NA";
-                _repositoryPath = "NA";
-                _fullName = "NA";
-                _email = "NA";
-                _projetId = "NA";
+                _gitApiKey = string.Empty;
+                _repositoryPath = string.Empty;
+                _fullName = string.Empty;
+                _email = string.Empty;
+                _projetId = string.Empty;
                 Write();
                 _isRead = true;
                 return;

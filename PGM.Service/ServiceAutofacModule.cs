@@ -3,7 +3,7 @@ using Module = Autofac.Module;
 
 namespace PGM.Service
 {
-    public class LibAutofacModule : Module
+    public class ServiceAutofacModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {

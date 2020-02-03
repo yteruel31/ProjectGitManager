@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using LibGit2Sharp;
+using NLog;
 using PGM.Service.Utilities;
 
 namespace PGM.Service.Git
@@ -12,6 +15,8 @@ namespace PGM.Service.Git
         private string Email => _settings.Email;
         private readonly IPGMSettings _settings;
         private Repository _repository;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
 
         public GitRepository(IPGMSettings settings)
         {
@@ -33,12 +38,34 @@ namespace PGM.Service.Git
             }
         }
 
+        public GitResult FetchRemote()
+        {
+            string logMessage = string.Empty;
+            try
+            {
+                Remote remote = _repository.Network.Remotes["origin"];
+                IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
+                Commands.Fetch(_repository, remote.Name, refSpecs, null, logMessage);
+                Logger.Info(logMessage);
+
+                return new GitResult(true, logMessage);
+            }
+            catch (LibGit2SharpException e)
+            {
+                return new GitResult(false, e);
+            }
+        }
+
         public GitResult<Branch> CheckoutIssueBranch(string issueId)
         {
             try
             {
+                FetchRemote();
+                CheckoutMaster();
+                _repository.CreateBranch($"issue/{issueId}");
                 Branch branch = _repository.Branches[$"issue/{issueId}"];
                 Branch resultBranch = Commands.Checkout(_repository, branch);
+                PushOnOriginBranch(branch);
 
                 return new GitResult<Branch>(true, resultBranch);
             }

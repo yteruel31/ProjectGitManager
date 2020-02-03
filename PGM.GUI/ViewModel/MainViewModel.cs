@@ -10,6 +10,7 @@ using PGM.GUI.AutoMapper;
 using PGM.GUI.Utilities;
 using PGM.Service.Gitlab;
 using PGM.Model;
+using PGM.Service.Git;
 using PGM.Service.Utilities;
 
 // ReSharper disable ConvertToNullCoalescingCompoundAssignment
@@ -24,13 +25,19 @@ namespace PGM.GUI.ViewModel
         private ICommand _activatedCommand;
         private GitlabIssue _selectedIssue;
         private PGMSettingsVO _pgmSettingsVo;
+        private IGitService _gitService;
 
-        public MainViewModel(IPGMSettings pgmSettings, IMapperVoToModel mapperVoToModel, IGitlabService gitlabService)
+        public MainViewModel(
+            IPGMSettings pgmSettings, 
+            IMapperVoToModel mapperVoToModel, 
+            IGitlabService gitlabService, 
+            IGitService gitService)
         {
             _pgmSettings = pgmSettings;
             _mapperVoToModel = mapperVoToModel;
             GroupedIssues.GroupDescriptions.Add(new PropertyGroupDescription(nameof(GitlabIssue.StepType)));
             _gitlabService = gitlabService;
+            _gitService = gitService;
         }
 
         public ICollectionView GroupedIssues
@@ -42,7 +49,23 @@ namespace PGM.GUI.ViewModel
 
         public ObservableCollection<GitlabIssue> GitlabIssues { get; set; } = new ObservableCollection<GitlabIssue>();
 
-        public ICommand CreateBranchLinkedWithIssueCommand { get; set; }
+        private ICommand _createBranchLinkedWithIssueCommand;
+
+        public ICommand CreateBranchLinkedWithIssueCommand =>
+            _createBranchLinkedWithIssueCommand ??
+            (_createBranchLinkedWithIssueCommand = CommandFactory.CreateAsync(CreateBranch, CanCreateBranch,
+                nameof(CreateBranchLinkedWithIssueCommand), this));
+
+        private bool CanCreateBranch()
+        {
+            return true;
+        }
+
+        private async Task CreateBranch()
+        {
+             await _gitlabService.SetAssigneeOnCurrentIssue(SelectedIssue);
+             _gitService.CreateBranchLinkedWithIssue(SelectedIssue);
+        }
 
         public ICommand CreateMergeRequestOnGitlabCommand{ get; set; }
 

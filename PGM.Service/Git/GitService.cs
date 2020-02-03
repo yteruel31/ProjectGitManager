@@ -4,13 +4,13 @@ using PGM.Service.Utilities;
 
 namespace PGM.Service.Git
 {
-    public class ActionService : IActionService
+    public class GitService : IGitService
     {
         private readonly IPGMSettings _settings;
         private readonly IGitRepository _gitRepository;
         private readonly IGitlabService _gitlabService;
 
-        public ActionService(IPGMSettings settings)
+        public GitService(IPGMSettings settings)
         {
             _settings = settings;
             _gitRepository = new GitRepository(settings);

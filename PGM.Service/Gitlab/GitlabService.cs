@@ -56,7 +56,7 @@ namespace PGM.Service.Gitlab
         {
             return new GitlabIssue()
             {
-                Id = issue.Id,
+                Id = issue.Iid,
                 Title = issue.Title,
                 Description = issue.Description,
                 GitlabMilestone = new GitlabMilestone()
@@ -127,14 +127,7 @@ namespace PGM.Service.Gitlab
         public async Task SetAssigneeOnCurrentIssue(GitlabIssue issue)
         {
             Assignee assignee = await _gitlabClientRepository.GetAssigneeFromCurrentUser();
-            issue.Assignees.Add(assignee.ToGitLabAssignee());
+            await _gitlabClientRepository.SetAssigneeOnCurrentIssue(issue, assignee);
         }
-    }
-
-    public interface IGitlabService
-    {
-        Task<List<GitlabIssue>> GetAllIssuesOfCurrentSprint();
-
-        Task SetAssigneeOnCurrentIssue(GitlabIssue issue);
     }
 }

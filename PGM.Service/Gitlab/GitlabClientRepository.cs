@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using GitLabApiClient;
 using GitLabApiClient.Models;
+using GitLabApiClient.Models.Issues.Requests;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.MergeRequests.Requests;
 using GitLabApiClient.Models.Milestones.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 using GitLabApiClient.Models.Users.Responses;
+using PGM.Model;
 using PGM.Service.Utilities;
 
 namespace PGM.Service.Gitlab
@@ -51,6 +53,22 @@ namespace PGM.Service.Gitlab
         public Task<IList<Label>> GetLabelsFromCurrentProject()
         {
             return _client.Projects.GetLabelsAsync(_settings.ProjectId);
+        }
+
+        public async Task SetAssigneeOnCurrentIssue(GitlabIssue issue, Assignee assignee)
+        {
+            Issue currentIssue = await GetIssue(issue);
+            List<int> assignees = currentIssue.Assignees.Select(a => a.Id).ToList();
+            assignees.Add(assignee.Id);
+            await _client.Issues.UpdateAsync(_settings.ProjectId, issue.Id, new UpdateIssueRequest
+            {
+                Assignees = assignees
+            });
+        }
+
+        private Task<Issue> GetIssue(GitlabIssue issue)
+        {
+            return _client.Issues.GetAsync(_settings.ProjectId, issue.Id);
         }
 
         public async Task<Assignee> GetAssigneeFromCurrentUser()
