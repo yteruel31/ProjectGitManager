@@ -69,6 +69,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileSystemRepository.cs" />
+    <Compile Include="IFileSystemRepository.cs" />
     <Compile Include="Gitlab\GitlabClientRepository.cs" />
     <Compile Include="Gitlab\GitlabClientResult.cs" />
     <Compile Include="Gitlab\GitlabExtension.cs" />
@@ -80,10 +82,9 @@
     <Compile Include="Git\GitResult.cs" />
     <Compile Include="Git\IGitService.cs" />
     <Compile Include="Git\IGitRepository.cs" />
+    <Compile Include="PGMService.cs" />
     <Compile Include="ServiceAutofacModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities\IPGMSettings.cs" />
-    <Compile Include="Utilities\PGMSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

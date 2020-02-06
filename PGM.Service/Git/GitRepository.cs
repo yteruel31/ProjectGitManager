@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using LibGit2Sharp;
 using NLog;
-using PGM.Service.Utilities;
+using PGM.Model;
 
 namespace PGM.Service.Git
 {
     public class GitRepository : IGitRepository
     {
-        private string RepositoryPath => _settings.RepositoryPath;
-        private string UserName => _settings.FullName;
+        private string FullName => _settings.FullName;
+        private string RepositoryPath => _settings.CurrentProject.RepositoryPath;
         private Branch MasterBranch => _repository.Branches["master"];
+        private Remote OriginRemote => _repository.Network.Remotes["origin"];
         private string Email => _settings.Email;
-        private readonly IPGMSettings _settings;
+
+        private readonly PGMSetting _settings;
         private Repository _repository;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
-        public GitRepository(IPGMSettings settings)
+        public GitRepository(PGMSetting settings)
         {
             _settings = settings;
             _repository = new Repository(RepositoryPath);
@@ -38,32 +40,23 @@ namespace PGM.Service.Git
             }
         }
 
-        public GitResult FetchRemote()
+        private Credentials GetCredentials(string username, string password)
         {
-            string logMessage = string.Empty;
-            try
+            return new UsernamePasswordCredentials
             {
-                Remote remote = _repository.Network.Remotes["origin"];
-                IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
-                Commands.Fetch(_repository, remote.Name, refSpecs, null, logMessage);
-                Logger.Info(logMessage);
-
-                return new GitResult(true, logMessage);
-            }
-            catch (LibGit2SharpException e)
-            {
-                return new GitResult(false, e);
-            }
+                Username = username,
+                Password = password
+            };
         }
 
         public GitResult<Branch> CheckoutIssueBranch(string issueId)
         {
             try
             {
-                FetchRemote();
-                CheckoutMaster();
                 _repository.CreateBranch($"issue/{issueId}");
                 Branch branch = _repository.Branches[$"issue/{issueId}"];
+                _repository.Branches.Update(branch,
+                    b => b.Remote = OriginRemote.Name, b => b.UpstreamBranch = branch.CanonicalName);
                 Branch resultBranch = Commands.Checkout(_repository, branch);
                 PushOnOriginBranch(branch);
 
@@ -113,14 +106,16 @@ namespace PGM.Service.Git
             {
                 return new GitResult(false, e);
             }
-            
         }
 
         public GitResult PushOnOriginBranch(Branch branch)
         {
             try
             {
-                _repository.Network.Push(branch);
+                _repository.Network.Push(OriginRemote, branch.UpstreamBranchCanonicalName, new PushOptions
+                {
+                    CredentialsProvider = (url, fromUrl, types) => GetCredentials(_settings.Credidential.Username, _settings.Credidential.Password)
+                });
                 return new GitResult(true, "OK");
             }
             catch (LibGit2SharpException e)
@@ -149,7 +144,7 @@ namespace PGM.Service.Git
 
         private Identity GetIdentity()
         {
-            return new Identity(UserName, Email);
+            return new Identity(FullName, Email);
         }
     }
 }

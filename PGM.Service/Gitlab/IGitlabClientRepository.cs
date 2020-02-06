@@ -9,7 +9,7 @@ namespace PGM.Service.Gitlab
 {
     public interface IGitlabClientRepository
     {
-        void PostMergeRequest(string branche, string mrTitle);
+        Task PostMergeRequest(string branch, string mrTitle, GitlabIssue issue);
 
         Task<IList<Issue>> GetIssuesFromCurrentProject();
 
@@ -18,5 +18,7 @@ namespace PGM.Service.Gitlab
         Task<Assignee> GetAssigneeFromCurrentUser();
 
         Task SetAssigneeOnCurrentIssue(GitlabIssue issue, Assignee assignee);
+
+        Task ValidateMergeRequest(GitlabIssue issue);
     }
 }

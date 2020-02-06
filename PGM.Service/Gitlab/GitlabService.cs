@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GitLabApiClient;
@@ -6,7 +7,6 @@ using GitLabApiClient.Models;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 using PGM.Model;
-using PGM.Service.Utilities;
 
 namespace PGM.Service.Gitlab
 {
@@ -14,7 +14,7 @@ namespace PGM.Service.Gitlab
     {
         private readonly IGitlabClientRepository _gitlabClientRepository;
 
-        public GitlabService(IPGMSettings settings)
+        public GitlabService(PGMSetting settings)
         {
             _gitlabClientRepository = new GitlabClientRepository(settings);
         }
@@ -68,6 +68,11 @@ namespace PGM.Service.Gitlab
             };
         }
 
+        private StepType GetStepType(Issue issue)
+        {
+            throw new NotImplementedException();
+        }
+
         private List<GitlabAssignee> GetGitlabAssignees(List<Assignee> assignees)
         {
             return assignees.Select(assignee => new GitlabAssignee
@@ -119,6 +124,12 @@ namespace PGM.Service.Gitlab
             return gitlabLabels;
         }
 
+        public Task CreateMergeRequest(GitlabIssue currentIssue)
+        {
+            string mrTitle = $"Issue/{currentIssue.Id} - {currentIssue.Title}";
+            return _gitlabClientRepository.PostMergeRequest($"issue/{currentIssue.Id}", mrTitle, currentIssue);
+        }
+
         private IEnumerable<Label> GetLabelsFromCurrentIssue(IList<Label> labelsResult, Issue currentIssue)
         {
             return labelsResult.Where(l => currentIssue.Labels.Contains(l.Name));
@@ -128,6 +139,11 @@ namespace PGM.Service.Gitlab
         {
             Assignee assignee = await _gitlabClientRepository.GetAssigneeFromCurrentUser();
             await _gitlabClientRepository.SetAssigneeOnCurrentIssue(issue, assignee);
+        }
+
+        public Task ValidateMergeRequest(GitlabIssue issue)
+        {
+            return _gitlabClientRepository.ValidateMergeRequest(issue);
         }
     }
 }

@@ -9,5 +9,9 @@ namespace PGM.Service.Gitlab
         Task<List<GitlabIssue>> GetAllIssuesOfCurrentSprint();
 
         Task SetAssigneeOnCurrentIssue(GitlabIssue issue);
+
+        Task CreateMergeRequest(GitlabIssue currentIssue);
+
+        Task ValidateMergeRequest(GitlabIssue issue);
     }
 }

@@ -6,6 +6,6 @@ namespace PGM.Service.Git
     {
         void CreateBranchLinkedWithIssue(GitlabIssue issue);
 
-        void ValidateActualBranch();
+        void CheckoutOnBranch(bool isMasterBranch, GitlabIssue issue = null);
     }
 }

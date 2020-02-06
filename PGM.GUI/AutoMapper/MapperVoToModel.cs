@@ -1,39 +1,27 @@
 ﻿using AutoMapper;
 using PGM.GUI.ViewModel;
-using PGM.Service.Utilities;
+using PGM.Model;
 
 namespace PGM.GUI.AutoMapper
 {
     public class MapperVoToModel : IMapperVoToModel
     {
-        private readonly IMapper _mapper;
+        public IMapper Mapper { get; set; }
 
         public MapperVoToModel()
         {
             MapperConfiguration config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<PGMSettings, PGMSettingsVO>();
-                cfg.CreateMap<PGMSettingsVO, PGMSettings>()
-                    .AfterMap((vo, settings) =>
-                    {
-                        settings.Email = vo.Email;
-                        settings.FullName = vo.FullName;
-                        settings.GitApiKey = vo.GitApiKey;
-                        settings.ProjectId = vo.ProjectId;
-                        settings.RepositoryPath = vo.RepositoryPath;
-                    });
+                cfg.CreateMap<PGMSetting, PGMSettingVO>()
+                    .ForMember(vo => vo.Projects, opt => opt.Ignore());
+                cfg.CreateMap<PGMSettingVO, PGMSetting>();
             });
-            _mapper = config.CreateMapper();
-        }
-
-        public PGMSettingsVO GetPgmSettingsVo(PGMSettings pgmSettings)
-        {
-            return _mapper.Map<PGMSettingsVO>(pgmSettings);
+            Mapper = config.CreateMapper();
         }
     }
 
     public interface IMapperVoToModel
     {
-        PGMSettingsVO GetPgmSettingsVo(PGMSettings pgmSettings);
+        IMapper Mapper { get; set; }
     }
 }

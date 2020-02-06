@@ -10,8 +10,8 @@ using PGM.GUI.AutoMapper;
 using PGM.GUI.Utilities;
 using PGM.Service.Gitlab;
 using PGM.Model;
+using PGM.Service;
 using PGM.Service.Git;
-using PGM.Service.Utilities;
 
 // ReSharper disable ConvertToNullCoalescingCompoundAssignment
 
@@ -20,34 +20,34 @@ namespace PGM.GUI.ViewModel
     public class MainViewModel : SubViewModelBase
     {
         private readonly IGitlabService _gitlabService;
-        private readonly IPGMSettings _pgmSettings;
+        private readonly IPgmService _pgmService;
         private readonly IMapperVoToModel _mapperVoToModel;
         private ICommand _activatedCommand;
         private GitlabIssue _selectedIssue;
-        private PGMSettingsVO _pgmSettingsVo;
+        private PGMSettingVO _pgmSettingVo;
         private IGitService _gitService;
 
         public MainViewModel(
-            IPGMSettings pgmSettings, 
             IMapperVoToModel mapperVoToModel, 
             IGitlabService gitlabService, 
-            IGitService gitService)
+            IGitService gitService,
+            IPgmService pgmService)
         {
-            _pgmSettings = pgmSettings;
             _mapperVoToModel = mapperVoToModel;
             GroupedIssues.GroupDescriptions.Add(new PropertyGroupDescription(nameof(GitlabIssue.StepType)));
             _gitlabService = gitlabService;
             _gitService = gitService;
+            _pgmService = pgmService;
         }
 
         public ICollectionView GroupedIssues
         {
-            get { return CollectionViewSource.GetDefaultView(GitlabIssues); }
+            get { return CollectionViewSource.GetDefaultView(GitlabIssues);}
         }
 
         public bool IsRefreshing { get; set; }
 
-        public ObservableCollection<GitlabIssue> GitlabIssues { get; set; } = new ObservableCollection<GitlabIssue>();
+        public ObservableCollection<GitlabIssueVO> GitlabIssues { get; set; } = new ObservableCollection<GitlabIssueVO>();
 
         private ICommand _createBranchLinkedWithIssueCommand;
 
@@ -67,46 +67,82 @@ namespace PGM.GUI.ViewModel
              _gitService.CreateBranchLinkedWithIssue(SelectedIssue);
         }
 
-        public ICommand CreateMergeRequestOnGitlabCommand{ get; set; }
+        private ICommand _createMergeRequestOnGitlabCommand;
 
-        public ICommand TestActualBranchCommand { get; set; }
+        public ICommand CreateMergeRequestOnGitlabCommand =>
+            _createMergeRequestOnGitlabCommand ??
+            (_createMergeRequestOnGitlabCommand = CommandFactory.CreateAsync(CreateMergeRequest, CanCreateMergeRequest,
+                nameof(CreateMergeRequestOnGitlabCommand), this));
 
-        public ICommand ValidateActualBranchCommand { get; set; }
+        private bool CanCreateMergeRequest()
+        {
+            return true;
+        }
+
+        private async Task CreateMergeRequest()
+        {
+            await _gitlabService.CreateMergeRequest(SelectedIssue);
+            _gitService.CheckoutOnBranch(true);
+        }
+
+        private ICommand _testActualBranchCommand;
+
+        public ICommand TestActualBranchCommand =>
+            _testActualBranchCommand ??
+            (_testActualBranchCommand =
+                CommandFactory.Create(TestActualBranch, CanTestActualBranch, nameof(TestActualBranchCommand)));
+
+        private bool CanTestActualBranch()
+        {
+            return true;
+        }
+
+        private void TestActualBranch()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        private ICommand _validateActualBranchCommand;
+
+        public ICommand ValidateActualBranchCommand =>
+            _validateActualBranchCommand ??
+            (_validateActualBranchCommand = CommandFactory.CreateAsync(ValidateActualBranch, CanValidateActualBranch,
+                nameof(ValidateActualBranchCommand), this));
+
+        private bool CanValidateActualBranch()
+        {
+            return true;
+        }
+
+        private async Task ValidateActualBranch()
+        {
+            await _gitlabService.ValidateMergeRequest(SelectedIssue);
+        }
 
         public ICommand LaunchPgmCommand =>
-            _activatedCommand ?? (_activatedCommand = CommandFactory.CreateAsync(LaunchPgm, CanLaunchPgm, nameof(LaunchPgmCommand), this));
+            _activatedCommand ?? (_activatedCommand = CommandFactory.Create(LaunchPgm, CanLaunchPgm, nameof(LaunchPgmCommand)));
 
         private bool CanLaunchPgm()
         {
             return true;
         }
 
-        public PGMSettingsVO PgmSettingsVo
+        public PGMSettingVO PgmSettingVo
         {
-            get { return _pgmSettingsVo; }
+            get { return _pgmSettingVo; }
 
             set
             {
-                if (_pgmSettingsVo != value)
+                if (_pgmSettingVo != value)
                 {
-                    Set(nameof(PgmSettingsVo), ref _pgmSettingsVo, value);
+                    Set(nameof(PgmSettingVo), ref _pgmSettingVo, value);
                 }
             }
         }
 
-        private async Task LaunchPgm()
+        private void LaunchPgm()
         {
-            PgmSettingsVo = _mapperVoToModel.GetPgmSettingsVo(_pgmSettings.GetPGMSettings);
-
-            if (string.IsNullOrEmpty(_pgmSettingsVo.RepositoryPath)
-                || !Directory.Exists(_pgmSettingsVo.RepositoryPath)
-                || string.IsNullOrEmpty(_pgmSettingsVo.GitApiKey)
-                || string.IsNullOrEmpty(_pgmSettingsVo.ProjectId))
-            {
-                return;
-            }
-
-            await LoadIssues();
+            _pgmService.InitializePgm();
         }
 
         public GitlabIssue SelectedIssue
@@ -123,25 +159,11 @@ namespace PGM.GUI.ViewModel
 
         private async Task LoadIssues(bool refresh = false)
         {
-            List<GitlabIssue> gitlabIssues = 
-                await await Task.Factory.StartNew(() => _gitlabService.GetAllIssuesOfCurrentSprint());
-            
             Application.Current.Dispatcher?.Invoke(() =>
             {
                 bool previousIsRefreshing = IsRefreshing;
                 IsRefreshing = true;
-                if (!refresh)
-                {
-                    GitlabIssues.Clear();
-                }
-
-                if (!string.IsNullOrEmpty(_pgmSettingsVo.GitApiKey))
-                {
-                    foreach (GitlabIssue gitlabIssue in gitlabIssues)
-                    {
-                        GitlabIssues.Add(gitlabIssue);
-                    }
-                }
+                
 
                 IsRefreshing = previousIsRefreshing;
 

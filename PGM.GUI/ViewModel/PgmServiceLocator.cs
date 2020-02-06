@@ -7,7 +7,6 @@ using GalaSoft.MvvmLight.Messaging;
 using PGM.GUI.AutoMapper;
 using PGM.GUI.View;
 using PGM.Service;
-using PGM.Service.Utilities;
 using IContainer = Autofac.IContainer;
 
 namespace PGM.GUI.ViewModel
@@ -64,9 +63,6 @@ namespace PGM.GUI.ViewModel
             containerBuilder.RegisterType<ViewModelLocator>();
 
             containerBuilder.RegisterModule<ServiceAutofacModule>();
-
-            containerBuilder.RegisterType<PGMSettings>()
-                .As<IPGMSettings>();
         }
     }
 }
