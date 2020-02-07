@@ -83,6 +83,7 @@
     <Compile Include="Git\IGitService.cs" />
     <Compile Include="Git\IGitRepository.cs" />
     <Compile Include="PGMService.cs" />
+    <Compile Include="PgmSettingManagerService.cs" />
     <Compile Include="ServiceAutofacModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

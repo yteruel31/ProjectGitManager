@@ -178,9 +178,14 @@
     <Compile Include="ViewModel\IsProcessingMessage.cs" />
     <Compile Include="ViewModel\ISubViewModelBase.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\Orchestrators\MainOrchestrator.cs" />
+    <Compile Include="ViewModel\Orchestrators\ProjectContentOrchestrator.cs" />
     <Compile Include="ViewModel\PgmServiceLocator.cs" />
     <Compile Include="ViewModel\PGMSettingVO.cs" />
+    <Compile Include="ViewModel\ProjectContentViewModel.cs" />
     <Compile Include="ViewModel\ProjectVO.cs" />
+    <Compile Include="ViewModel\Services\DialogCoordinatorService.cs" />
+    <Compile Include="ViewModel\StepTypeVO.cs" />
     <Compile Include="ViewModel\SubViewModelBase.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="View\IssueDetailControl.xaml.cs">
@@ -188,6 +193,9 @@
     </Compile>
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ProjectContentControl.xaml.cs">
+      <DependentUpon>ProjectContentControl.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +234,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="View\ProjectContentControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PGM.Model\PGM.Model.csproj">
@@ -237,5 +249,6 @@
       <Name>PGM.Service</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace PGM.Model
 {
@@ -10,12 +11,14 @@ namespace PGM.Model
         
         public string Email { get; set; }
 
-        public Credidential Credidential { get; set; }
+        public Credential Credential { get; set; }
 
-        public Project CurrentProject { get; set; }
+        [JsonIgnore]
+        public GitlabProject CurrentGitlabProject { get; set; }
 
-        public List<Project> Projects { get; set; }
+        public List<GitlabProject> Projects { get; set; }
 
-        public bool SettingsIsSetup { get; set; }
+        [JsonIgnore]
+        public bool PgmHasSetup { get; set; }
     }
 }

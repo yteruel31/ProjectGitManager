@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using LibGit2Sharp;
 using NLog;
 using PGM.Model;
@@ -9,20 +7,20 @@ namespace PGM.Service.Git
 {
     public class GitRepository : IGitRepository
     {
-        private string FullName => _settings.FullName;
-        private string RepositoryPath => _settings.CurrentProject.RepositoryPath;
+        private string FullName => Settings.FullName;
+        private string RepositoryPath => "D:\\git\\testforpgm";
         private Branch MasterBranch => _repository.Branches["master"];
         private Remote OriginRemote => _repository.Network.Remotes["origin"];
-        private string Email => _settings.Email;
-
-        private readonly PGMSetting _settings;
-        private Repository _repository;
+        private string Email => Settings.Email;
+        private IPgmSettingManagerService _pgmSettingManagerService;
+        private PGMSetting Settings => _pgmSettingManagerService.CurrentSettings;
+        private readonly Repository _repository;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
-        public GitRepository(PGMSetting settings)
+        public GitRepository(IPgmSettingManagerService pgmSettingManagerService)
         {
-            _settings = settings;
+            _pgmSettingManagerService = pgmSettingManagerService;
             _repository = new Repository(RepositoryPath);
         }
 
@@ -114,7 +112,7 @@ namespace PGM.Service.Git
             {
                 _repository.Network.Push(OriginRemote, branch.UpstreamBranchCanonicalName, new PushOptions
                 {
-                    CredentialsProvider = (url, fromUrl, types) => GetCredentials(_settings.Credidential.Username, _settings.Credidential.Password)
+                    CredentialsProvider = (url, fromUrl, types) => GetCredentials(Settings.Credential.Username, Settings.Credential.Password)
                 });
                 return new GitResult(true, "OK");
             }

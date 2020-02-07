@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using PGM.Model;
 using Module = Autofac.Module;
 
 namespace PGM.Service
@@ -16,6 +17,8 @@ namespace PGM.Service
                 .Where(t => t.Name.EndsWith("Repository"))
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
+
+            builder.RegisterType<PGMSetting>();
 
             base.Load(builder);
         }

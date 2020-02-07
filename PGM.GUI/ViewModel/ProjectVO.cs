@@ -5,12 +5,45 @@ namespace PGM.GUI.ViewModel
 {
     public class ProjectVO : ObservableObject
     {
-        public string Id { get; set; }
+        private string _id;
+        private string _name;
 
-        public string Name { get; set; }
+        public string Id
+        {
+            get { return _id; }
+            set
+            {
+                if (_id != value)
+                {
+                    Set(nameof(Id), ref _id, value);
+                }
+            }
+        }
+
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                if (_name != value)
+                {
+                    Set(nameof(Name), ref _name, value);
+                }
+            }
+        }
 
         public string RepositoryPath { get; set; }
 
         public List<GitlabIssueVO> Issues { get; set; }
+
+        public ProjectContentViewModel Context
+        {
+            get
+            {
+                ProjectContentViewModel projectContentViewModel = PgmServiceLocator.Current.GetInstance<ProjectContentViewModel>();
+                projectContentViewModel.CurrentProject = this;
+                return projectContentViewModel;
+            }
+        }
     }
 }

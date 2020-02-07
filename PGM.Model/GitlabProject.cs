@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace PGM.Model
 {
-    public class Project
+    public class GitlabProject
     {
         public string Id { get; set; }
 

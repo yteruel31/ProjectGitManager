@@ -12,9 +12,14 @@ namespace PGM.GUI.AutoMapper
         {
             MapperConfiguration config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<PGMSetting, PGMSettingVO>()
-                    .ForMember(vo => vo.Projects, opt => opt.Ignore());
+                cfg.CreateMap<PGMSetting, PGMSettingVO>();
                 cfg.CreateMap<PGMSettingVO, PGMSetting>();
+                cfg.CreateMap<ProjectVO, GitlabProject>();
+                cfg.CreateMap<GitlabProject, ProjectVO>();
+                cfg.CreateMap<GitlabIssueVO, GitlabIssue>();
+                cfg.CreateMap<GitlabIssue, GitlabIssueVO>();
+                cfg.CreateMap<CredentialVO, Credential>();
+                cfg.CreateMap<Credential, CredentialVO>();
             });
             Mapper = config.CreateMapper();
         }

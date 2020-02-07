@@ -5,14 +5,11 @@ namespace PGM.Service.Git
 {
     public class GitService : IGitService
     {
-        private readonly PGMSetting _settings;
         private readonly IGitRepository _gitRepository;
-        private readonly IGitlabService _gitlabService;
 
-        public GitService(PGMSetting settings)
+        public GitService(IGitRepository gitRepository)
         {
-            _settings = settings;
-            _gitRepository = new GitRepository(settings);
+            _gitRepository = gitRepository;
         }
 
         public void CreateBranchLinkedWithIssue(GitlabIssue issue)

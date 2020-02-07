@@ -56,6 +56,11 @@ namespace PGM.GUI.ViewModel
                 .AssignableTo<ViewModelBase>()
                 .InstancePerLifetimeScope();
 
+            containerBuilder.RegisterAssemblyTypes(assembly)
+                .Where(t => t.Name.EndsWith("Orchestrator"))
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
             containerBuilder.RegisterType<MapperVoToModel>().As<IMapperVoToModel>();
 
             containerBuilder.RegisterType<MainWindow>();

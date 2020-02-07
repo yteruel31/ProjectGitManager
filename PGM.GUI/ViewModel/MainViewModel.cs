@@ -1,17 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Data;
+﻿using System.Threading.Tasks;
 using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
 using PGM.GUI.AutoMapper;
 using PGM.GUI.Utilities;
-using PGM.Service.Gitlab;
+using PGM.GUI.ViewModel.Orchestrators;
+using PGM.GUI.ViewModel.Services;
 using PGM.Model;
 using PGM.Service;
-using PGM.Service.Git;
 
 // ReSharper disable ConvertToNullCoalescingCompoundAssignment
 
@@ -19,118 +14,82 @@ namespace PGM.GUI.ViewModel
 {
     public class MainViewModel : SubViewModelBase
     {
-        private readonly IGitlabService _gitlabService;
         private readonly IPgmService _pgmService;
         private readonly IMapperVoToModel _mapperVoToModel;
+        private readonly IMainOrchestrator _mainOrchestrator;
         private ICommand _activatedCommand;
-        private GitlabIssue _selectedIssue;
+        private readonly IDialogCoordinatorService _dialogCoordinatorService;
         private PGMSettingVO _pgmSettingVo;
-        private IGitService _gitService;
+        private ICommand _initializeSetupSettingsCommand;
+        private ICommand _showAddProjectDialogCommand;
+        private ICommand _addProjectCommand;
+        private ProjectVO _projectVo;
 
-        public MainViewModel(
-            IMapperVoToModel mapperVoToModel, 
-            IGitlabService gitlabService, 
-            IGitService gitService,
-            IPgmService pgmService)
+        public MainViewModel(IMapperVoToModel mapperVoToModel, 
+            IPgmService pgmService, 
+            IMainOrchestrator mainOrchestrator)
         {
             _mapperVoToModel = mapperVoToModel;
-            GroupedIssues.GroupDescriptions.Add(new PropertyGroupDescription(nameof(GitlabIssue.StepType)));
-            _gitlabService = gitlabService;
-            _gitService = gitService;
-            _pgmService = pgmService;
+           _pgmService = pgmService;
+           _mainOrchestrator = mainOrchestrator;
+           _dialogCoordinatorService = new DialogCoordinatorService(this);
         }
 
-        public ICollectionView GroupedIssues
-        {
-            get { return CollectionViewSource.GetDefaultView(GitlabIssues);}
-        }
+        public ICommand ShowAddProjectDialogCommand =>
+            _showAddProjectDialogCommand ??
+            (_showAddProjectDialogCommand =
+                CommandFactory.CreateAsync(ShowAddProjectDialog, CanShowAddProjectDialog, nameof(ShowAddProjectDialogCommand), this));
 
-        public bool IsRefreshing { get; set; }
-
-        public ObservableCollection<GitlabIssueVO> GitlabIssues { get; set; } = new ObservableCollection<GitlabIssueVO>();
-
-        private ICommand _createBranchLinkedWithIssueCommand;
-
-        public ICommand CreateBranchLinkedWithIssueCommand =>
-            _createBranchLinkedWithIssueCommand ??
-            (_createBranchLinkedWithIssueCommand = CommandFactory.CreateAsync(CreateBranch, CanCreateBranch,
-                nameof(CreateBranchLinkedWithIssueCommand), this));
-
-        private bool CanCreateBranch()
+        private bool CanShowAddProjectDialog()
         {
             return true;
         }
 
-        private async Task CreateBranch()
+        private async Task ShowAddProjectDialog()
         {
-             await _gitlabService.SetAssigneeOnCurrentIssue(SelectedIssue);
-             _gitService.CreateBranchLinkedWithIssue(SelectedIssue);
+            await _dialogCoordinatorService.ShowConfigSettings("AddProjectDialog");
         }
 
-        private ICommand _createMergeRequestOnGitlabCommand;
+        public ICommand AddProjectCommand =>
+            _addProjectCommand ??
+            (_addProjectCommand =
+                CommandFactory.CreateAsync<CustomDialog>(AddProject, CanAddProject, nameof(AddProjectCommand), this));
 
-        public ICommand CreateMergeRequestOnGitlabCommand =>
-            _createMergeRequestOnGitlabCommand ??
-            (_createMergeRequestOnGitlabCommand = CommandFactory.CreateAsync(CreateMergeRequest, CanCreateMergeRequest,
-                nameof(CreateMergeRequestOnGitlabCommand), this));
+        private bool CanAddProject(CustomDialog sender)
+        {
+            return _mainOrchestrator.CheckIfGitlabProjectExist(ProjectVo.Id ?? "").Result;
+        }
 
-        private bool CanCreateMergeRequest()
+        private async Task AddProject(CustomDialog sender)
+        {
+            GitlabProject gitlabProject = await _mainOrchestrator.GetGitlabProject(ProjectVo.Id);
+            ProjectVo.Name = gitlabProject.Name;
+            PgmSettingVo.Projects.Add(ProjectVo);
+            PGMSetting setting = _mapperVoToModel.Mapper.Map<PGMSetting>(PgmSettingVo);
+            _pgmService.WriteOnPgmSettings(setting);
+            await _dialogCoordinatorService.CloseDialog(sender);
+        }
+
+        public ICommand InitializeSetupSettingsCommand =>
+            _initializeSetupSettingsCommand ??
+            (_initializeSetupSettingsCommand = CommandFactory.CreateAsync<CustomDialog>(InitializeSetupSettings,
+                CanInitializeSetupSettings, nameof(InitializeSetupSettingsCommand), this));
+
+        private bool CanInitializeSetupSettings(CustomDialog sender)
         {
             return true;
         }
 
-        private async Task CreateMergeRequest()
+        private async Task InitializeSetupSettings(CustomDialog sender)
         {
-            await _gitlabService.CreateMergeRequest(SelectedIssue);
-            _gitService.CheckoutOnBranch(true);
-        }
-
-        private ICommand _testActualBranchCommand;
-
-        public ICommand TestActualBranchCommand =>
-            _testActualBranchCommand ??
-            (_testActualBranchCommand =
-                CommandFactory.Create(TestActualBranch, CanTestActualBranch, nameof(TestActualBranchCommand)));
-
-        private bool CanTestActualBranch()
-        {
-            return true;
-        }
-
-        private void TestActualBranch()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        private ICommand _validateActualBranchCommand;
-
-        public ICommand ValidateActualBranchCommand =>
-            _validateActualBranchCommand ??
-            (_validateActualBranchCommand = CommandFactory.CreateAsync(ValidateActualBranch, CanValidateActualBranch,
-                nameof(ValidateActualBranchCommand), this));
-
-        private bool CanValidateActualBranch()
-        {
-            return true;
-        }
-
-        private async Task ValidateActualBranch()
-        {
-            await _gitlabService.ValidateMergeRequest(SelectedIssue);
-        }
-
-        public ICommand LaunchPgmCommand =>
-            _activatedCommand ?? (_activatedCommand = CommandFactory.Create(LaunchPgm, CanLaunchPgm, nameof(LaunchPgmCommand)));
-
-        private bool CanLaunchPgm()
-        {
-            return true;
+            PGMSetting pgmSetting = _mapperVoToModel.Mapper.Map<PGMSetting>(PgmSettingVo);
+            _pgmService.WriteOnPgmSettings(pgmSetting);
+            await _dialogCoordinatorService.CloseDialog(sender);
         }
 
         public PGMSettingVO PgmSettingVo
         {
             get { return _pgmSettingVo; }
-
             set
             {
                 if (_pgmSettingVo != value)
@@ -140,38 +99,37 @@ namespace PGM.GUI.ViewModel
             }
         }
 
-        private void LaunchPgm()
+        public ProjectVO ProjectVo
         {
-            _pgmService.InitializePgm();
-        }
-
-        public GitlabIssue SelectedIssue
-        {
-            get { return _selectedIssue; }
+            get { return _projectVo; }
             set
             {
-                if (_selectedIssue != value)
+                if (_projectVo != value)
                 {
-                    Set(nameof(SelectedIssue), ref _selectedIssue, value);
+                    Set(nameof(ProjectVo), ref _projectVo, value);
                 }
             }
         }
 
-        private async Task LoadIssues(bool refresh = false)
+        public ICommand LaunchPgmCommand =>
+            _activatedCommand ?? 
+            (_activatedCommand = CommandFactory.CreateAsync(LaunchPgm, CanLaunchPgm, nameof(LaunchPgmCommand), this));
+
+        private bool CanLaunchPgm()
         {
-            Application.Current.Dispatcher?.Invoke(() =>
+            return true;
+        }
+
+        private async Task LaunchPgm()
+        {
+            PGMSetting setting = _pgmService.InitializePgm();
+            PgmSettingVo = _mapperVoToModel.Mapper.Map<PGMSettingVO>(setting);
+            ProjectVo = new ProjectVO();
+
+            if (!setting.PgmHasSetup)
             {
-                bool previousIsRefreshing = IsRefreshing;
-                IsRefreshing = true;
-                
-
-                IsRefreshing = previousIsRefreshing;
-
-                if (refresh)
-                {
-                    GroupedIssues.Refresh();
-                }
-            });
+                await _dialogCoordinatorService.ShowConfigSettings("SetupSettingsDialog");
+            }
         }
     }
 }

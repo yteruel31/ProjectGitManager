@@ -1,6 +1,6 @@
 ﻿namespace PGM.Model
 {
-    public class Credidential
+    public class Credential
     {
         public string Username { get; set; }
 

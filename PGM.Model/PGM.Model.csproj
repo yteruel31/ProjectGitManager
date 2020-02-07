@@ -44,12 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Credidential.cs" />
+    <Compile Include="Credential.cs" />
     <Compile Include="GitlabAssignee.cs" />
     <Compile Include="GitlabIssue.cs" />
     <Compile Include="GitlabLabel.cs" />
     <Compile Include="GitlabMilestone.cs" />
-    <Compile Include="Project.cs" />
+    <Compile Include="GitlabProject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PGMSetting.cs" />
     <Compile Include="StepType.cs" />

@@ -25,11 +25,6 @@ namespace PGM.Service
 
         public void WriteOnFileData(object objectToJson)
         {
-            if (!_isRead)
-            {
-                return;
-            }
-
             if (!Directory.Exists(GetFolderPath()))
             {
                 Directory.CreateDirectory(GetFolderPath());
@@ -47,7 +42,7 @@ namespace PGM.Service
         {
             if (!FileExist(GetDataPath()))
             {
-                return new FileSystemResult<T>(true, "Fichier non trouvé");
+                return new FileSystemResult<T>(false, "Fichier non trouvé");
             }
 
             string dataPath = GetDataPath();

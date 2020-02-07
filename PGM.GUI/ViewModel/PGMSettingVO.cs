@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using GalaSoft.MvvmLight;
 
 namespace PGM.GUI.ViewModel
@@ -8,7 +11,9 @@ namespace PGM.GUI.ViewModel
         private string _gitLabApiKey;
         private string _email;
         private string _fullName;
-        private bool _settingsIsSetup;
+        private bool _pgmHasSetup;
+        private ICollectionView _groupedProjects;
+        private CredentialVO _credential;
 
         public string GitLabApiKey
         {
@@ -46,18 +51,66 @@ namespace PGM.GUI.ViewModel
             }
         }
 
-        public bool SettingsIsSetup
+        public CredentialVO Credential
         {
-            get { return _settingsIsSetup; }
+            get { return _credential; }
             set
             {
-                if (_settingsIsSetup != value)
+                if (_credential == null)
                 {
-                    Set(nameof(SettingsIsSetup), ref _settingsIsSetup, value);
+                    _credential = new CredentialVO();
+                }
+
+                if (_credential != value)
+                {
+                    Set(nameof(Credential), ref _credential, value);
                 }
             }
         }
 
-        public List<ProjectVO> Projects { get; set; }
+        public bool PgmHasSetup
+        {
+            get { return _pgmHasSetup; }
+            set
+
+            {
+                if (_pgmHasSetup != value)
+                {
+                    Set(nameof(PgmHasSetup), ref _pgmHasSetup, value);
+                }
+            }
+        }
+
+        public ObservableCollection<ProjectVO> Projects { get; set; } = new ObservableCollection<ProjectVO>();
+    }
+
+    public class CredentialVO : ObservableObject
+    {
+        private string _userName;
+        private string _password;
+
+        public string Username
+        {
+            get { return _userName; }
+            set
+            {
+                if (_userName != value)
+                {
+                    Set(nameof(Username), ref _userName, value);
+                }
+            }
+        }
+
+        public string Password
+        {
+            get { return _password; }
+            set
+            {
+                if (_password != value)
+                {
+                    Set(nameof(Password), ref _password, value);
+                }
+            }
+        }
     }
 }
