@@ -24,6 +24,8 @@ namespace PGM.GUI.ViewModel
         private ICommand _showAddProjectDialogCommand;
         private ICommand _addProjectCommand;
         private ProjectVO _projectVo;
+        private CustomDialog _setupSettingsDialog;
+        private CustomDialog _addProjectDialog;
 
         public MainViewModel(IMapperVoToModel mapperVoToModel, 
             IPgmService pgmService, 
@@ -47,44 +49,47 @@ namespace PGM.GUI.ViewModel
 
         private async Task ShowAddProjectDialog()
         {
-            await _dialogCoordinatorService.ShowConfigSettings("AddProjectDialog");
+            if (_addProjectDialog == null)
+            {
+                _addProjectDialog = await _dialogCoordinatorService.ShowConfigSettings("AddProjectDialog");
+            }
         }
 
         public ICommand AddProjectCommand =>
             _addProjectCommand ??
             (_addProjectCommand =
-                CommandFactory.CreateAsync<CustomDialog>(AddProject, CanAddProject, nameof(AddProjectCommand), this));
+                CommandFactory.CreateAsync(AddProject, CanAddProject, nameof(AddProjectCommand), this));
 
-        private bool CanAddProject(CustomDialog sender)
+        private bool CanAddProject()
         {
             return _mainOrchestrator.CheckIfGitlabProjectExist(ProjectVo.Id ?? "").Result;
         }
 
-        private async Task AddProject(CustomDialog sender)
+        private async Task AddProject()
         {
             GitlabProject gitlabProject = await _mainOrchestrator.GetGitlabProject(ProjectVo.Id);
             ProjectVo.Name = gitlabProject.Name;
             PgmSettingVo.Projects.Add(ProjectVo);
             PGMSetting setting = _mapperVoToModel.Mapper.Map<PGMSetting>(PgmSettingVo);
             _pgmService.WriteOnPgmSettings(setting);
-            await _dialogCoordinatorService.CloseDialog(sender);
+            await _dialogCoordinatorService.CloseDialog(_addProjectDialog);
         }
 
         public ICommand InitializeSetupSettingsCommand =>
             _initializeSetupSettingsCommand ??
-            (_initializeSetupSettingsCommand = CommandFactory.CreateAsync<CustomDialog>(InitializeSetupSettings,
+            (_initializeSetupSettingsCommand = CommandFactory.CreateAsync(InitializeSetupSettings,
                 CanInitializeSetupSettings, nameof(InitializeSetupSettingsCommand), this));
 
-        private bool CanInitializeSetupSettings(CustomDialog sender)
+        private bool CanInitializeSetupSettings()
         {
             return true;
         }
 
-        private async Task InitializeSetupSettings(CustomDialog sender)
+        private async Task InitializeSetupSettings()
         {
             PGMSetting pgmSetting = _mapperVoToModel.Mapper.Map<PGMSetting>(PgmSettingVo);
             _pgmService.WriteOnPgmSettings(pgmSetting);
-            await _dialogCoordinatorService.CloseDialog(sender);
+            await _dialogCoordinatorService.CloseDialog(_setupSettingsDialog);
         }
 
         public PGMSettingVO PgmSettingVo
@@ -126,9 +131,9 @@ namespace PGM.GUI.ViewModel
             PgmSettingVo = _mapperVoToModel.Mapper.Map<PGMSettingVO>(setting);
             ProjectVo = new ProjectVO();
 
-            if (!setting.PgmHasSetup)
+            if(!setting.PgmHasSetup && _setupSettingsDialog == null)
             {
-                await _dialogCoordinatorService.ShowConfigSettings("SetupSettingsDialog");
+                _setupSettingsDialog = await _dialogCoordinatorService.ShowConfigSettings("SetupSettingsDialog");
             }
         }
     }

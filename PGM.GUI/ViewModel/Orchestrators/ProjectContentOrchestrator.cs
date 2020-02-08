@@ -10,9 +10,9 @@ namespace PGM.GUI.ViewModel.Orchestrators
 {
     public class ProjectContentOrchestrator : IProjectContentOrchestrator
     {
-        private IGitlabService _gitlabService;
-        private IGitService _gitService;
-        private IMapperVoToModel _mapperVoToModel;
+        private readonly IGitlabService _gitlabService;
+        private readonly IGitService _gitService;
+        private readonly IMapperVoToModel _mapperVoToModel;
 
         public ProjectContentOrchestrator(
             IGitlabService gitlabService, 
@@ -68,17 +68,4 @@ namespace PGM.GUI.ViewModel.Orchestrators
             await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, project, StepType.Validating);
         }
      }
-
-    public interface IProjectContentOrchestrator
-    {
-        Task CreateMergeRequestActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo);
-
-        Task ValidateActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo);
-
-        Task CreateNewBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo);
-
-        Task<List<GitlabIssueVO>> GetGitlabIssue(ProjectVO project);
-
-        Task TestActualBranch(GitlabIssueVO issueVo, ProjectVO projectVo);
-    }
 }

@@ -9,12 +9,13 @@ namespace PGM.GUI.ViewModel.Services
     {
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly ISubViewModelBase _subViewModelBase;
-        private readonly MetroWindow _mainWindow = (MetroWindow) Application.Current.MainWindow;
+        private readonly MetroWindow _mainWindow;
 
         public DialogCoordinatorService(ISubViewModelBase subViewModelBase)
         {
             _subViewModelBase = subViewModelBase;
             _dialogCoordinator = new DialogCoordinator();
+            _mainWindow = (MetroWindow)Application.Current.MainWindow;
         }
 
 
@@ -23,7 +24,7 @@ namespace PGM.GUI.ViewModel.Services
             return _dialogCoordinator.ShowMessageAsync(_subViewModelBase, title, message);
         }
 
-        public async Task ShowConfigSettings(string resourceName)
+        public async Task<CustomDialog> ShowConfigSettings(string resourceName)
         {
             CustomDialog dialog = new CustomDialog(_mainWindow, new MetroDialogSettings
             {
@@ -35,6 +36,8 @@ namespace PGM.GUI.ViewModel.Services
             };
 
             await _mainWindow.ShowMetroDialogAsync(dialog);
+
+            return dialog;
         }
 
         public Task CloseDialog(CustomDialog dialog)
@@ -45,7 +48,7 @@ namespace PGM.GUI.ViewModel.Services
 
     public interface IDialogCoordinatorService
     {
-        Task ShowConfigSettings(string resourceName);
+        Task<CustomDialog> ShowConfigSettings(string resourceName);
 
         Task CloseDialog(CustomDialog dialog);
     }
