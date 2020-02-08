@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
 using PGM.GUI.AutoMapper;
@@ -27,6 +27,21 @@ namespace PGM.GUI.ViewModel
         private CustomDialog _setupSettingsDialog;
         private CustomDialog _addProjectDialog;
 
+        public ICommand ShowAddProjectDialogCommand =>
+            _showAddProjectDialogCommand ??
+            (_showAddProjectDialogCommand =
+                CommandFactory.CreateAsync(ShowAddProjectDialog, CanShowAddProjectDialog, nameof(ShowAddProjectDialogCommand), this));
+
+        public ICommand AddProjectCommand =>
+            _addProjectCommand ??
+            (_addProjectCommand =
+                CommandFactory.CreateAsync(AddProject, CanAddProject, nameof(AddProjectCommand), this));
+
+        public ICommand InitializeSetupSettingsCommand =>
+            _initializeSetupSettingsCommand ??
+            (_initializeSetupSettingsCommand = CommandFactory.CreateAsync(InitializeSetupSettings,
+                CanInitializeSetupSettings, nameof(InitializeSetupSettingsCommand), this));
+
         public MainViewModel(IMapperVoToModel mapperVoToModel, 
             IPgmService pgmService, 
             IMainOrchestrator mainOrchestrator)
@@ -36,11 +51,6 @@ namespace PGM.GUI.ViewModel
            _mainOrchestrator = mainOrchestrator;
            _dialogCoordinatorService = new DialogCoordinatorService(this);
         }
-
-        public ICommand ShowAddProjectDialogCommand =>
-            _showAddProjectDialogCommand ??
-            (_showAddProjectDialogCommand =
-                CommandFactory.CreateAsync(ShowAddProjectDialog, CanShowAddProjectDialog, nameof(ShowAddProjectDialogCommand), this));
 
         private bool CanShowAddProjectDialog()
         {
@@ -55,14 +65,12 @@ namespace PGM.GUI.ViewModel
             }
         }
 
-        public ICommand AddProjectCommand =>
-            _addProjectCommand ??
-            (_addProjectCommand =
-                CommandFactory.CreateAsync(AddProject, CanAddProject, nameof(AddProjectCommand), this));
-
         private bool CanAddProject()
         {
-            return _mainOrchestrator.CheckIfGitlabProjectExist(ProjectVo.Id ?? "").Result;
+            var debug = _mainOrchestrator.CheckIfGitlabProjectExist(ProjectVo.Id ?? "").Result
+                               && _mainOrchestrator.CheckIfGitDirectoryPathExist(ProjectVo.RepositoryPath);
+
+            return debug;
         }
 
         private async Task AddProject()
@@ -75,10 +83,7 @@ namespace PGM.GUI.ViewModel
             await _dialogCoordinatorService.CloseDialog(_addProjectDialog);
         }
 
-        public ICommand InitializeSetupSettingsCommand =>
-            _initializeSetupSettingsCommand ??
-            (_initializeSetupSettingsCommand = CommandFactory.CreateAsync(InitializeSetupSettings,
-                CanInitializeSetupSettings, nameof(InitializeSetupSettingsCommand), this));
+        
 
         private bool CanInitializeSetupSettings()
         {
@@ -127,13 +132,16 @@ namespace PGM.GUI.ViewModel
 
         private async Task LaunchPgm()
         {
-            PGMSetting setting = _pgmService.InitializePgm();
-            PgmSettingVo = _mapperVoToModel.Mapper.Map<PGMSettingVO>(setting);
-            ProjectVo = new ProjectVO();
-
-            if(!setting.PgmHasSetup && _setupSettingsDialog == null)
+            if (PgmSettingVo == null && ProjectVo == null)
             {
-                _setupSettingsDialog = await _dialogCoordinatorService.ShowConfigSettings("SetupSettingsDialog");
+                PGMSetting setting = _pgmService.InitializePgm();
+                PgmSettingVo = _mapperVoToModel.Mapper.Map<PGMSettingVO>(setting);
+                ProjectVo = new ProjectVO();
+
+                if (!setting.PgmHasSetup && _setupSettingsDialog == null)
+                {
+                    _setupSettingsDialog = await _dialogCoordinatorService.ShowConfigSettings("SetupSettingsDialog");
+                }
             }
         }
     }

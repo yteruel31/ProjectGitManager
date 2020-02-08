@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -6,8 +6,6 @@ namespace PGM.Service
 {
     public class FileSystemRepository : IFileSystemRepository
     {
-        private bool _isRead;
-
         private string GetDataPath()
         {
             return Path.Combine(GetFolderPath(), "data.json");
@@ -23,9 +21,14 @@ namespace PGM.Service
             return File.Exists(filePath);
         }
 
+        public bool DirectoryExist(string directoryPath)
+        {
+            return Directory.Exists(directoryPath);
+        }
+
         public void WriteOnFileData(object objectToJson)
         {
-            if (!Directory.Exists(GetFolderPath()))
+            if (!DirectoryExist(GetFolderPath()))
             {
                 Directory.CreateDirectory(GetFolderPath());
             }
@@ -53,8 +56,6 @@ namespace PGM.Service
                 string str = sr.ReadToEnd();
                 jsonToObject = JsonConvert.DeserializeObject<T>(str);
             }
-
-            _isRead = true;
 
             return new FileSystemResult<T>(true, jsonToObject);
         }
