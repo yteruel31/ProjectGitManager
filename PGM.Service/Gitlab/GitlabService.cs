@@ -195,6 +195,11 @@ namespace PGM.Service.Gitlab
             await _gitlabClientRepository.SetAssigneeOnCurrentIssue(issue, assignee, project);
         }
 
+        public Task SetAssigneeOnMergeRequest(GitlabIssue issue, GitlabProject project)
+        {
+            return _gitlabClientRepository.SetAssigneeOnMergeRequest(issue, project);
+        }
+
         public Task ValidateMergeRequest(GitlabIssue issue, GitlabProject currentProject)
         {
             return _gitlabClientRepository.ValidateMergeRequest(issue, currentProject);

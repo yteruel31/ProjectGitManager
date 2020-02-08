@@ -27,5 +27,7 @@ namespace PGM.Service.Gitlab
         Task RemoveLabelOnCurrentIssue(GitlabIssue issue, GitlabProject project, string labelName);
 
         Task SetLabelOnCurrentIssue(GitlabIssue issue, GitlabProject project, string labelName);
+
+        Task SetAssigneeOnMergeRequest(GitlabIssue gitlabIssue, GitlabProject project);
     }
 }

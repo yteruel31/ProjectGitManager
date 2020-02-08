@@ -15,10 +15,15 @@ namespace PGM.GUI.ViewModel
     {
         private ICommand _testActualBranchCommand;
         private ICommand _validateActualBranchCommand;
+        private ICommand _createBranchLinkedWithIssueCommand;
         private GitlabIssueVO _selectedIssue;
         private readonly IProjectContentOrchestrator _projectContentOrchestrator;
         private ICommand _createMergeRequestOnGitlabCommand;
         private ProjectVO _currentProject;
+
+        public ObservableCollection<GitlabIssueVO> GitlabIssues { get; set; } = new ObservableCollection<GitlabIssueVO>();
+
+        public bool IsRefreshing { get; set; }
 
         public ProjectVO CurrentProject
         {
@@ -36,7 +41,20 @@ namespace PGM.GUI.ViewModel
             }
         }
 
-        public bool IsRefreshing { get; set; }
+        public ICommand TestActualBranchCommand =>
+            _testActualBranchCommand ??
+            (_testActualBranchCommand =
+                CommandFactory.CreateAsync(TestActualBranch, CanTestActualBranch, nameof(TestActualBranchCommand), this));
+        
+        public ICommand CreateBranchLinkedWithIssueCommand =>
+            _createBranchLinkedWithIssueCommand ??
+            (_createBranchLinkedWithIssueCommand = CommandFactory.CreateAsync(CreateBranch, CanCreateBranch,
+                nameof(CreateBranchLinkedWithIssueCommand), this));
+
+        public ICommand CreateMergeRequestOnGitlabCommand =>
+            _createMergeRequestOnGitlabCommand ??
+            (_createMergeRequestOnGitlabCommand = CommandFactory.CreateAsync(CreateMergeRequest, CanCreateMergeRequest,
+                nameof(CreateMergeRequestOnGitlabCommand), this));
 
         public ProjectContentViewModel(IProjectContentOrchestrator projectContentOrchestrator)
         {
@@ -53,61 +71,44 @@ namespace PGM.GUI.ViewModel
             return SelectedIssue != null && SelectedIssue.StepType == StepTypeVO.Validating;
         }
 
-        private Task ValidateActualBranch()
+        private async Task ValidateActualBranch()
         {
-            return _projectContentOrchestrator.ValidateActualBranch(SelectedIssue, CurrentProject);
+            await _projectContentOrchestrator.ValidateActualBranch(SelectedIssue, CurrentProject);
+            LoadIssues(CurrentProject);
         }
-
-        public ICommand CreateMergeRequestOnGitlabCommand =>
-            _createMergeRequestOnGitlabCommand ??
-            (_createMergeRequestOnGitlabCommand = CommandFactory.CreateAsync(CreateMergeRequest, CanCreateMergeRequest,
-                nameof(CreateMergeRequestOnGitlabCommand), this));
 
         private bool CanCreateMergeRequest()
         {
             return SelectedIssue != null && SelectedIssue.StepType == StepTypeVO.InProgress;
         }
 
-        private Task CreateMergeRequest()
+        private async Task CreateMergeRequest()
         {
-            return _projectContentOrchestrator.CreateMergeRequestActualBranch(SelectedIssue, CurrentProject);
+            await _projectContentOrchestrator.CreateMergeRequestActualBranch(SelectedIssue, CurrentProject);
+            LoadIssues(CurrentProject);
         }
-
-        public ICommand TestActualBranchCommand =>
-            _testActualBranchCommand ??
-            (_testActualBranchCommand =
-                CommandFactory.Create(TestActualBranch, CanTestActualBranch, nameof(TestActualBranchCommand)));
-
-        private ICommand _createBranchLinkedWithIssueCommand;
-
-        public ICommand CreateBranchLinkedWithIssueCommand =>
-            _createBranchLinkedWithIssueCommand ??
-            (_createBranchLinkedWithIssueCommand = CommandFactory.CreateAsync(CreateBranch, CanCreateBranch,
-                nameof(CreateBranchLinkedWithIssueCommand), this));
 
         private bool CanCreateBranch()
         {
             return SelectedIssue != null && SelectedIssue.StepType == StepTypeVO.Backlog;
         }
 
-        private Task CreateBranch()
+        private async Task CreateBranch()
         {
-            return _projectContentOrchestrator.CreateNewBranch(SelectedIssue, CurrentProject);
+            await _projectContentOrchestrator.CreateNewBranch(SelectedIssue, CurrentProject);
+            LoadIssues(CurrentProject);
         }
-
-        
 
         private bool CanTestActualBranch()
         {
             return SelectedIssue != null && SelectedIssue.StepType == StepTypeVO.ToValidate;
         }
 
-        private void TestActualBranch()
+        private async Task TestActualBranch()
         {
-            throw new System.NotImplementedException();
+            await _projectContentOrchestrator.TestActualBranch(SelectedIssue, CurrentProject);
+            LoadIssues(CurrentProject);
         }
-
-        public ObservableCollection<GitlabIssueVO> GitlabIssues { get; set; } = new ObservableCollection<GitlabIssueVO>();
 
         public ICollectionView GroupedIssues
         {

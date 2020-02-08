@@ -19,5 +19,7 @@ namespace PGM.Service.Gitlab
         Task<GitlabProject> GetProject(string projectId);
 
         Task AssignCorrectLabelRelatedToCurrentIssue(GitlabIssue issue, GitlabProject project, StepType stepType);
+
+        Task SetAssigneeOnMergeRequest(GitlabIssue issue, GitlabProject project);
     }
 }

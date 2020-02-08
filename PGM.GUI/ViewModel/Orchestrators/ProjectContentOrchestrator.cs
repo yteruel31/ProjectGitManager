@@ -58,6 +58,15 @@ namespace PGM.GUI.ViewModel.Orchestrators
                 .Select(gitlabIssue => _mapperVoToModel.Mapper.Map<GitlabIssueVO>(gitlabIssue))
                 .ToList();
         }
+
+        public async Task TestActualBranch(GitlabIssueVO issueVo, ProjectVO projectVo)
+        {
+            GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
+            GitlabProject project = _mapperVoToModel.Mapper.Map<GitlabProject>(projectVo);
+            _gitService.CheckoutOnBranch(false, issue);
+            await _gitlabService.SetAssigneeOnMergeRequest(issue, project);
+            await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, project, StepType.Validating);
+        }
      }
 
     public interface IProjectContentOrchestrator
@@ -69,5 +78,7 @@ namespace PGM.GUI.ViewModel.Orchestrators
         Task CreateNewBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo);
 
         Task<List<GitlabIssueVO>> GetGitlabIssue(ProjectVO project);
+
+        Task TestActualBranch(GitlabIssueVO issueVo, ProjectVO projectVo);
     }
 }

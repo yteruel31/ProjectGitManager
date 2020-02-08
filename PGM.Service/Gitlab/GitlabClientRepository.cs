@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GitLabApiClient;
-using GitLabApiClient.Internal.Paths;
 using GitLabApiClient.Models;
 using GitLabApiClient.Models.Issues.Requests;
 using GitLabApiClient.Models.Issues.Responses;
@@ -12,7 +11,6 @@ using GitLabApiClient.Models.MergeRequests.Responses;
 using GitLabApiClient.Models.Milestones.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 using GitLabApiClient.Models.Users.Responses;
-using LibGit2Sharp;
 using PGM.Model;
 
 namespace PGM.Service.Gitlab
@@ -122,6 +120,18 @@ namespace PGM.Service.Gitlab
             await _client.Issues.UpdateAsync(project.Id, issue.Id, new UpdateIssueRequest
             {
                 Assignees = assignees
+            });
+        }
+
+        public async Task SetAssigneeOnMergeRequest(GitlabIssue gitlabIssue, GitlabProject project)
+        {
+            Issue issue = await GetIssue(project, gitlabIssue);
+            MergeRequest mergeRequest = await GetMergeRequestFromCurrentIssue(issue, project);
+            Assignee assignee = await GetAssigneeFromCurrentUser();
+
+            await _client.MergeRequests.UpdateAsync(project.Id, mergeRequest.Id, new UpdateMergeRequest
+            {
+                AssigneeId = assignee.Id
             });
         }
 
