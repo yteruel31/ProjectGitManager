@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -19,6 +19,11 @@ namespace PGM.Service
         public bool FileExist(string filePath)
         {
             return File.Exists(filePath);
+        }
+
+        public bool DataFileExist()
+        {
+            return FileExist(GetDataPath());
         }
 
         public bool DirectoryExist(string directoryPath)

@@ -7,5 +7,9 @@ namespace PGM.Service.Git
         void CreateBranchLinkedWithIssue(GitlabIssue issue);
 
         void CheckoutOnBranch(bool isMasterBranch, GitlabIssue issue = null);
+
+        void SetupRepositoryOnCurrentProject(string repositoryPath);
+
+        void RebaseActualBranchOntoMaster(GitlabIssue issue);
     }
 }

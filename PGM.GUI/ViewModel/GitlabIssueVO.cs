@@ -1,4 +1,5 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System.Collections.Generic;
+using GalaSoft.MvvmLight;
 
 namespace PGM.GUI.ViewModel
 {
@@ -35,6 +36,12 @@ namespace PGM.GUI.ViewModel
         }
 
         public string Description { get; set; }
+
+        public List<string> Labels { get; set; }
+
+        public List<GitlabAssigneeVO> Assignees { get; set; }
+
+        public string WebUrl { get; set; }
 
         public StepTypeVO StepType { get; set; }
     }

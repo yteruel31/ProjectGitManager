@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GitLabApiClient;
 using GitLabApiClient.Models;
+using GitLabApiClient.Models.Groups.Responses;
 using GitLabApiClient.Models.Issues.Requests;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.MergeRequests.Requests;
@@ -38,18 +39,18 @@ namespace PGM.Service.Gitlab
 
         public async Task ValidateMergeRequest(GitlabIssue issue, GitlabProject currentProject)
         {
-            Issue currentIssue = await GetIssue(currentProject ,issue);
-            MergeRequest mergeRequest = await GetMergeRequestFromCurrentIssue(currentIssue, currentProject);
+            MergeRequest mergeRequest = await GetMergeRequestFromCurrentIssue(issue, currentProject);
             await _client.MergeRequests.AcceptAsync(currentProject.Id, mergeRequest.Iid, new AcceptMergeRequest
             {
                 RemoveSourceBranch = true,
                 MergeWhenPipelineSucceeds = false,
-                MergeCommitMessage = $"[{currentIssue.Iid}] - {currentIssue.Title}"
+                MergeCommitMessage = $"[{issue.Id}] - {issue.Title}"
             });
         }
 
-        private async Task<MergeRequest> GetMergeRequestFromCurrentIssue(Issue issue, GitlabProject project)
+        public async Task<MergeRequest> GetMergeRequestFromCurrentIssue(GitlabIssue gitlabIssue, GitlabProject project)
         {
+            Issue issue = await GetIssue(project, gitlabIssue);
             IList<MergeRequest> mergeRequests = 
                 await _client.MergeRequests.GetAsync(project.Id);
 
@@ -57,13 +58,27 @@ namespace PGM.Service.Gitlab
                 .SingleOrDefault(m => m.SourceBranch == $"issue/{issue.Iid}");
         }
 
-        public async Task<Milestone> GetCurrentSprint()
+        private async Task<Milestone> GetCurrentSprint(GitlabProject project)
         {
-            IList<Milestone> millestones = await _client.Groups.GetMilestonesAsync(Settings.CurrentGitlabProject.Id);
+            if (!string.IsNullOrEmpty(project.GroupId))
+            {
+                IList<Milestone> millestones = await _client.Groups.GetMilestonesAsync(project.GroupId, options => options.State = MilestoneState.Active);
 
-            return millestones
-                .OrderBy(m => Convert.ToDateTime(m.StartDate))
-                .First(m => m.State == MilestoneState.Active);
+                return millestones
+                    .OrderBy(m => m.StartDate)
+                    .First();
+            }
+
+            if (!string.IsNullOrEmpty(project.Id))
+            {
+                IList<Milestone> millestones = await _client.Projects.GetMilestonesAsync(project.Id, options => options.State = MilestoneState.Active);
+
+                return millestones
+                    .OrderBy(m => m.StartDate)
+                    .First();
+            }
+
+            return await Task.FromResult(new Milestone());
         }
 
         private CreateMergeRequest GetMergeRequestInfo(string sourceBranch, string mrTitle, Issue issue)
@@ -73,16 +88,23 @@ namespace PGM.Service.Gitlab
             return createdMergeRequest;
         }
 
-        public Task<IList<Issue>> GetIssuesFromCurrentProject(GitlabProject project)
+        public async Task<IList<Issue>> GetIssuesFromCurrentProject(GitlabProject project)
         {
             if (project.Id != null)
             {
-                return _client.Issues.GetAsync(project.Id);
+                Milestone milestone = await GetCurrentSprint(project);
+                IList<Issue> issues = await _client.Issues.GetAsync(project.Id, options =>
+                {
+                    options.State = IssueState.All;
+                    options.MilestoneTitle = milestone.Title;
+                });
+
+                return issues;
             }
 
             IList<Issue> emptyList = new List<Issue>();
 
-            return Task.FromResult(emptyList);
+            return await Task.FromResult(emptyList);
         }
 
         public Task<IList<Label>> GetLabelsFromCurrentProject(GitlabProject project)
@@ -108,7 +130,7 @@ namespace PGM.Service.Gitlab
             labels.Remove(labelName);
             await _client.Issues.UpdateAsync(project.Id, currentIssue.Iid, new UpdateIssueRequest
             {
-                Labels = labels
+                Labels = new List<string>()
             });
         }
 
@@ -125,24 +147,30 @@ namespace PGM.Service.Gitlab
 
         public async Task SetAssigneeOnMergeRequest(GitlabIssue gitlabIssue, GitlabProject project)
         {
-            Issue issue = await GetIssue(project, gitlabIssue);
-            MergeRequest mergeRequest = await GetMergeRequestFromCurrentIssue(issue, project);
+            MergeRequest mergeRequest = await GetMergeRequestFromCurrentIssue(gitlabIssue, project);
             Assignee assignee = await GetAssigneeFromCurrentUser();
 
-            await _client.MergeRequests.UpdateAsync(project.Id, mergeRequest.Id, new UpdateMergeRequest
+            await _client.MergeRequests.UpdateAsync(project.Id, mergeRequest.Iid, new UpdateMergeRequest
             {
                 AssigneeId = assignee.Id
             });
         }
 
-        private Task<Issue> GetIssue(GitlabProject project, GitlabIssue issue)
+        public async Task<Issue> GetIssue(GitlabProject project, GitlabIssue issue)
         {
-            return _client.Issues.GetAsync(project.Id, issue.Id);
+            IList<Issue> issues = 
+               await _client.Issues.GetAsync(project.Id, options => options.State = IssueState.All);
+            return issues.First(i => i.Iid == issue.Id);
         }
 
         public Task<Project> GetProject(string projectId)
         {
             return _client.Projects.GetAsync(projectId);
+        }
+
+        public Task<Group> GetGroup(string groupId)
+        {
+            return _client.Groups.GetAsync(groupId);
         }
 
         public async Task<Assignee> GetAssigneeFromCurrentUser()

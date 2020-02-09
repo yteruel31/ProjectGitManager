@@ -10,7 +10,9 @@ namespace PGM.Model
         public string Name { get; set; }
 
         public string RepositoryPath { get; set; }
-        
+
+        public string GroupId { get; set; }
+
         [JsonIgnore]
         public List<GitlabIssue> Issues { get; set; }
     }

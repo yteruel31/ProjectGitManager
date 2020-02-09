@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Globalization;
 using LibGit2Sharp;
 using NLog;
 using PGM.Model;
@@ -8,20 +10,27 @@ namespace PGM.Service.Git
     public class GitRepository : IGitRepository
     {
         private string FullName => Settings.FullName;
-        private string RepositoryPath => "D:\\git\\testforpgm";
         private Branch MasterBranch => _repository.Branches["master"];
+        private Branch UpStreamMasterBranch => _repository.Branches["origin/master"];
         private Remote OriginRemote => _repository.Network.Remotes["origin"];
         private string Email => Settings.Email;
         private IPgmSettingManagerService _pgmSettingManagerService;
         private PGMSetting Settings => _pgmSettingManagerService.CurrentSettings;
-        private readonly Repository _repository;
+        private Repository _repository;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 
         public GitRepository(IPgmSettingManagerService pgmSettingManagerService)
         {
             _pgmSettingManagerService = pgmSettingManagerService;
-            _repository = new Repository(RepositoryPath);
+        }
+
+        public void SetupRepository(string repositoryPath)
+        {
+            if (repositoryPath != null)
+            {
+                _repository = new Repository(repositoryPath);
+            }
         }
 
         public GitResult<Branch> CheckoutMaster()
@@ -66,11 +75,35 @@ namespace PGM.Service.Git
             }
         }
 
+        public GitResult<Branch> GetActualBranch(string issueId)
+        {
+            try
+            {
+                Branch branch = _repository.Branches[$"issue/{issueId}"];
+
+                return new GitResult<Branch>(true, branch);
+            }
+            catch (LibGit2SharpException e)
+            {
+                return new GitResult<Branch>(false, e);
+            }
+        }
+
         public GitResult<MergeStatus> PullOnRepository()
         {
             try
             {
-                MergeResult mergeResult = Commands.Pull(_repository, GetSignature(), null);
+                MergeResult mergeResult = Commands.Pull(_repository, GetSignature(), new PullOptions
+                {
+                    FetchOptions = new FetchOptions
+                    {
+                        CredentialsProvider = (url, fromUrl, types) => GetCredentials(Settings.Credential.Username, Settings.Credential.Password)
+                    },
+                    MergeOptions = new MergeOptions
+                    {
+                        FailOnConflict = true
+                    }
+                });
                 return new GitResult<MergeStatus>(true, mergeResult.Status);
             }
             catch (LibGit2SharpException e)
@@ -83,7 +116,7 @@ namespace PGM.Service.Git
         {
             try
             {
-                RebaseResult rebaseResult = _repository.Rebase.Start(actualBranch, actualBranch, MasterBranch, GetIdentity(), null);
+                RebaseResult rebaseResult = _repository.Rebase.Start(actualBranch, UpStreamMasterBranch, MasterBranch, GetIdentity(), null);
                 return new GitResult<RebaseStatus>(true, rebaseResult.Status);
             }
             catch (LibGit2SharpException e)
@@ -96,7 +129,10 @@ namespace PGM.Service.Git
         {
             try
             {
-                _repository.Network.Push(MasterBranch);
+                _repository.Network.Push(MasterBranch, new PushOptions
+                {
+                    CredentialsProvider = (url, fromUrl, types) => GetCredentials(Settings.Credential.Username, Settings.Credential.Password)
+                });
 
                 return new GitResult(true, "OK");
             }
@@ -106,14 +142,22 @@ namespace PGM.Service.Git
             }
         }
 
-        public GitResult PushOnOriginBranch(Branch branch)
+        public GitResult PushOnOriginBranch(Branch branch, bool force = false)
         {
             try
             {
-                _repository.Network.Push(OriginRemote, branch.UpstreamBranchCanonicalName, new PushOptions
+                if (!force)
                 {
-                    CredentialsProvider = (url, fromUrl, types) => GetCredentials(Settings.Credential.Username, Settings.Credential.Password)
-                });
+                    _repository.Network.Push(OriginRemote, branch.UpstreamBranchCanonicalName, new PushOptions
+                    {
+                        CredentialsProvider = (url, fromUrl, types) => GetCredentials(Settings.Credential.Username, Settings.Credential.Password)
+                    });
+                }
+                else
+                {
+                    Process.Start("git", $"push --force");
+                }
+               
                 return new GitResult(true, "OK");
             }
             catch (LibGit2SharpException e)

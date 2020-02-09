@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
@@ -26,11 +27,18 @@ namespace PGM.GUI.ViewModel
         private ProjectVO _projectVo;
         private CustomDialog _setupSettingsDialog;
         private CustomDialog _addProjectDialog;
+        private ICommand _closeAddProjectDialogCommand;
+        private bool _groupFieldIsVisible;
 
         public ICommand ShowAddProjectDialogCommand =>
             _showAddProjectDialogCommand ??
             (_showAddProjectDialogCommand =
                 CommandFactory.CreateAsync(ShowAddProjectDialog, CanShowAddProjectDialog, nameof(ShowAddProjectDialogCommand), this));
+
+        public ICommand CloseAddProjectDialogCommand =>
+            _closeAddProjectDialogCommand ??
+            (_closeAddProjectDialogCommand =
+                CommandFactory.CreateAsync(CloseAddProjectDialog, CanCloseAddProjectDialog, nameof(ShowAddProjectDialogCommand), this));
 
         public ICommand AddProjectCommand =>
             _addProjectCommand ??
@@ -67,23 +75,43 @@ namespace PGM.GUI.ViewModel
 
         private bool CanAddProject()
         {
-            var debug = _mainOrchestrator.CheckIfGitlabProjectExist(ProjectVo.Id ?? "").Result
-                               && _mainOrchestrator.CheckIfGitDirectoryPathExist(ProjectVo.RepositoryPath);
+            if (GroupFieldIsVisible)
+            {
+                return _mainOrchestrator.CheckIfGitlabProjectExist(ProjectVo.Id ?? "").Result
+                       && _mainOrchestrator.CheckIfGitlabGroupExist(ProjectVo.GroupId ?? "").Result
+                       && _mainOrchestrator.CheckIfGitDirectoryPathExist(ProjectVo.RepositoryPath);
+            }
 
-            return debug;
+            return _mainOrchestrator.CheckIfGitlabProjectExist(ProjectVo.Id ?? "").Result
+                   && _mainOrchestrator.CheckIfGitDirectoryPathExist(ProjectVo.RepositoryPath);
         }
 
         private async Task AddProject()
         {
             GitlabProject gitlabProject = await _mainOrchestrator.GetGitlabProject(ProjectVo.Id);
             ProjectVo.Name = gitlabProject.Name;
+            
+            if (!GroupFieldIsVisible)
+            {
+                ProjectVo.GroupId = string.Empty;
+            }
+
             PgmSettingVo.Projects.Add(ProjectVo);
             PGMSetting setting = _mapperVoToModel.Mapper.Map<PGMSetting>(PgmSettingVo);
             _pgmService.WriteOnPgmSettings(setting);
-            await _dialogCoordinatorService.CloseDialog(_addProjectDialog);
+            await CloseAddProjectDialog();
         }
 
-        
+        private bool CanCloseAddProjectDialog()
+        {
+            return true;
+        }
+
+        private async Task CloseAddProjectDialog()
+        {
+            await _dialogCoordinatorService.CloseDialog(_addProjectDialog);
+            _addProjectDialog = null;
+        }
 
         private bool CanInitializeSetupSettings()
         {
@@ -121,6 +149,18 @@ namespace PGM.GUI.ViewModel
             }
         }
 
+        public bool GroupFieldIsVisible
+        {
+            get { return _groupFieldIsVisible; }
+            set
+            {
+                if (_groupFieldIsVisible != value)
+                {
+                    Set(nameof(GroupFieldIsVisible), ref _groupFieldIsVisible, value);
+                }
+            }
+        }
+ 
         public ICommand LaunchPgmCommand =>
             _activatedCommand ?? 
             (_activatedCommand = CommandFactory.CreateAsync(LaunchPgm, CanLaunchPgm, nameof(LaunchPgmCommand), this));

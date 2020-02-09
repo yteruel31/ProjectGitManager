@@ -7,6 +7,7 @@ namespace PGM.GUI.ViewModel
     {
         private string _id;
         private string _name;
+        private string _groupId;
 
         public string Id
         {
@@ -33,6 +34,18 @@ namespace PGM.GUI.ViewModel
         }
 
         public string RepositoryPath { get; set; }
+
+        public string GroupId
+        {
+            get { return _groupId; }
+            set
+            {
+                if (_groupId != value)
+                {
+                    Set(nameof(GroupId), ref _groupId, value);
+                }
+            }
+        }
 
         public List<GitlabIssueVO> Issues { get; set; }
 

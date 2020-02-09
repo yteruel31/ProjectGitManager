@@ -24,12 +24,17 @@ namespace PGM.GUI.ViewModel.Orchestrators
             _mapperVoToModel = mapperVoToModel;
         }
 
+        public void SetupRepositoryOnCurrentProject(string repositoryPath)
+        {
+            _gitService.SetupRepositoryOnCurrentProject(repositoryPath);
+        }
+
         public async Task ValidateActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)
         {
             GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
             GitlabProject currentProject = _mapperVoToModel.Mapper.Map<GitlabProject>(currentProjectVo);
+            _gitService.RebaseActualBranchOntoMaster(issue);
             await _gitlabService.ValidateMergeRequest(issue, currentProject);
-            await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, currentProject, StepType.Done);
         }
 
         public async Task CreateMergeRequestActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)
@@ -66,6 +71,14 @@ namespace PGM.GUI.ViewModel.Orchestrators
             _gitService.CheckoutOnBranch(false, issue);
             await _gitlabService.SetAssigneeOnMergeRequest(issue, project);
             await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, project, StepType.Validating);
+        }
+
+        public Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssueVO issueVo, ProjectVO projectVo)
+        {
+            GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
+            GitlabProject project = _mapperVoToModel.Mapper.Map<GitlabProject>(projectVo);
+
+            return _gitlabService.MergeRequestFromCurrentIssueHaveConflict(issue, project);
         }
      }
 }

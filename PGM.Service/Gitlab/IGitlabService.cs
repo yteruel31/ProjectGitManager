@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using GitLabApiClient.Models.Issues.Responses;
 using PGM.Model;
 
 namespace PGM.Service.Gitlab
@@ -18,8 +19,12 @@ namespace PGM.Service.Gitlab
 
         Task<GitlabProject> GetProject(string projectId);
 
+        Task<bool> GroupExist(string groupId);
+
         Task AssignCorrectLabelRelatedToCurrentIssue(GitlabIssue issue, GitlabProject project, StepType stepType);
 
         Task SetAssigneeOnMergeRequest(GitlabIssue issue, GitlabProject project);
+
+        Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssue gitlabIssue, GitlabProject currentProject);
     }
 }

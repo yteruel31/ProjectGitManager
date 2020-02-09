@@ -19,5 +19,7 @@ namespace PGM.Model
         public StepType StepType { get; set; }
 
         public bool IsClosed { get; set; }
+
+        public string WebUrl { get; set; }
     }
 }

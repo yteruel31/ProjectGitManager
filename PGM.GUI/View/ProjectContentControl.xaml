@@ -8,6 +8,21 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              DataContext="{Binding Source={StaticResource Locator}, Path=MainPgm.ProjectVo.Context}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <Style x:Key="SteTypeContainerStyle" TargetType="{x:Type GroupItem}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Expander Header="{Binding Name}" IsExpanded="True">
+                                <ItemsPresenter />
+                            </Expander>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -17,26 +32,38 @@
             <Grid Grid.Row="0">
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <Button 
-                    Command="{Binding CreateBranchLinkedWithIssueCommand}"
-                    Content="Create Branch" 
-                    ToolTip="Create branch linked with corresponding issue"/>
+                        Style="{DynamicResource SquareButtonStyle}"
+                        Command="{Binding CreateBranchLinkedWithIssueCommand}"
+                        Content="Create Branch" 
+                        Margin="2"
+                        Padding="10"
+                        ToolTip="Create branch linked with corresponding issue"/>
                     <Button 
-                    Command="{Binding CreateMergeRequestOnGitlabCommand}"
-                    Content="Merge Request"
-                    ToolTip="Create Merge Request on Gitlab"/>
+                        Style="{DynamicResource SquareButtonStyle}"
+                        Command="{Binding CreateMergeRequestOnGitlabCommand}"
+                        Margin="2"
+                        Padding="10"
+                        Content="Merge Request"
+                        ToolTip="Create Merge Request on Gitlab"/>
                     <Button 
-                    Command="{Binding TestActualBranchCommand}"
-                    Content="Test Branch"
-                    ToolTip="Test Branch"/>
+                        Style="{DynamicResource SquareButtonStyle}"
+                        Command="{Binding TestActualBranchCommand}"
+                        Margin="2"
+                        Padding="10"
+                        Content="Test Branch"
+                        ToolTip="Test Branch"/>
                     <Button 
-                    Command="{Binding ValidateActualBranchCommand}"
-                    Content="Validate" 
-                    ToolTip="Validate the implementation"/>
+                        Style="{DynamicResource SquareButtonStyle}"
+                        Command="{Binding ValidateActualBranchCommand}"
+                        Margin="2"
+                        Padding="10"
+                        Content="Validate" 
+                        ToolTip="Validate the implementation"/>
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="400" MinWidth="100" />
+                    <ColumnDefinition Width="500" MinWidth="100" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition MinWidth="100" />
                 </Grid.ColumnDefinitions>
@@ -46,17 +73,14 @@
                     ItemsSource="{Binding GroupedIssues}" 
                     SelectedItem="{Binding SelectedIssue}">
                         <ListBox.GroupStyle>
-                            <GroupStyle>
-                                <GroupStyle.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                                    </DataTemplate>
-                                </GroupStyle.HeaderTemplate>
-                            </GroupStyle>
+                            <GroupStyle ContainerStyle="{StaticResource SteTypeContainerStyle}" />
                         </ListBox.GroupStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="model:GitlabIssue">
-                                <TextBlock Text="{Binding Title}"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Id}" FontWeight="Bold" Margin="0 0 20 0"/>
+                                    <TextBlock Text="{Binding Title}"/>
+                                </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>

@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using PGM.GUI.Utilities;
 using PGM.GUI.ViewModel.Orchestrators;
+using PGM.GUI.ViewModel.Services;
 using PGM.Model;
 
 namespace PGM.GUI.ViewModel
@@ -18,8 +21,10 @@ namespace PGM.GUI.ViewModel
         private ICommand _createBranchLinkedWithIssueCommand;
         private GitlabIssueVO _selectedIssue;
         private readonly IProjectContentOrchestrator _projectContentOrchestrator;
+        private readonly IDialogCoordinatorService _dialogCoordinatorService;
         private ICommand _createMergeRequestOnGitlabCommand;
         private ProjectVO _currentProject;
+        private ICommand _openLinkInBrowserCommand;
 
         public ObservableCollection<GitlabIssueVO> GitlabIssues { get; set; } = new ObservableCollection<GitlabIssueVO>();
 
@@ -41,6 +46,11 @@ namespace PGM.GUI.ViewModel
             }
         }
 
+        public ICommand OpenLinkInBrowserCommand =>
+            _openLinkInBrowserCommand ??
+            (_openLinkInBrowserCommand =
+                CommandFactory.Create(OpenLinkInBrowser, CanOpenLinkInBrowser, nameof(OpenLinkInBrowserCommand)));
+        
         public ICommand TestActualBranchCommand =>
             _testActualBranchCommand ??
             (_testActualBranchCommand =
@@ -59,6 +69,7 @@ namespace PGM.GUI.ViewModel
         public ProjectContentViewModel(IProjectContentOrchestrator projectContentOrchestrator)
         {
             _projectContentOrchestrator = projectContentOrchestrator;
+            _dialogCoordinatorService = new DialogCoordinatorService(this);
         }
 
         public ICommand ValidateActualBranchCommand =>
@@ -68,13 +79,27 @@ namespace PGM.GUI.ViewModel
 
         private bool CanValidateActualBranch()
         {
-            return SelectedIssue != null && SelectedIssue.StepType == StepTypeVO.Validating;
+            return SelectedIssue != null
+                   && SelectedIssue.StepType == StepTypeVO.Validating;
         }
 
         private async Task ValidateActualBranch()
         {
-            await _projectContentOrchestrator.ValidateActualBranch(SelectedIssue, CurrentProject);
-            LoadIssues(CurrentProject);
+            GitlabIssueVO selectedIssue = SelectedIssue;
+            bool haveConflits = await _projectContentOrchestrator.MergeRequestFromCurrentIssueHaveConflict(SelectedIssue, CurrentProject);
+            if (selectedIssue != null)
+            {
+                if (!haveConflits)
+                {
+                    await _projectContentOrchestrator.ValidateActualBranch(selectedIssue, CurrentProject);
+                    LoadIssues(CurrentProject);
+                }
+                else
+                {
+                    await _dialogCoordinatorService.ShowOkCancel("La MergeRequest à des conflits",
+                        "Veuillez les corriger avant de continuer");
+                }
+            }
         }
 
         private bool CanCreateMergeRequest()
@@ -132,12 +157,29 @@ namespace PGM.GUI.ViewModel
             }
         }
 
+        private bool CanOpenLinkInBrowser()
+        {
+            if(SelectedIssue != null)
+            {
+                return !string.IsNullOrEmpty(SelectedIssue.WebUrl);
+            }
+
+            return false;
+        }
+
+        private void OpenLinkInBrowser()
+        {
+            Process.Start(SelectedIssue.WebUrl);
+        }
+
         private async void LoadIssues(ProjectVO currentProjectVo, bool refresh = false)
         {
             if (currentProjectVo != null)
             {
+                _projectContentOrchestrator.SetupRepositoryOnCurrentProject(currentProjectVo.RepositoryPath);
                 List<GitlabIssueVO> gitlabIssueVos = await _projectContentOrchestrator.GetGitlabIssue(currentProjectVo);
-                
+                gitlabIssueVos = gitlabIssueVos.OrderBy(i => (int) i.StepType).ToList();
+
                 Application.Current.Dispatcher?.Invoke(() =>
                 {
                     bool previousIsRefreshing = IsRefreshing;

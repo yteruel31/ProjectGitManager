@@ -6,16 +6,20 @@ namespace PGM.Service.Git
     {
         GitResult DeleteLocalBranch(Branch branch);
 
-        GitResult PushOnOriginBranch(Branch branch);
+        GitResult PushOnOriginBranch(Branch branch, bool force);
 
         GitResult PushOnOriginMaster();
 
         GitResult<RebaseStatus> RebaseOntoMaster(Branch actualBranch);
+
+        GitResult<Branch> GetActualBranch(string issueId);
 
         GitResult<MergeStatus> PullOnRepository();
 
         GitResult<Branch> CheckoutIssueBranch(string issueId);
 
         GitResult<Branch> CheckoutMaster();
+
+        void SetupRepository(string repositoryPath);
     }
 }

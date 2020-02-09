@@ -12,6 +12,7 @@
         DataContext="{Binding Source={StaticResource Locator}, Path=MainPgm}">
     <Window.Resources>
         <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <UserControl x:Key="SetupSettingsDialog"
                          MinHeight="200">
                 <StackPanel>
@@ -39,9 +40,17 @@
                     <TextBox Text="{Binding ProjectVo.Id}" />
                     <TextBlock Text="Répertoire"/>
                     <TextBox Text="{Binding ProjectVo.RepositoryPath}"/>
-
-                    <Button Content="Ajouter" Command="{Binding AddProjectCommand}"
-                            CommandParameter="{Binding ., RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type mah:CustomDialog}}}"/>
+                    <CheckBox Content="Le projet est dans un groupe ?" IsChecked="{Binding GroupFieldIsVisible}"/>
+                    <TextBlock 
+                        Text="Id du groupe" 
+                        Visibility="{Binding GroupFieldIsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBox 
+                        Text="{Binding ProjectVo.GroupId}"
+                        Visibility="{Binding GroupFieldIsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Ajouter" Command="{Binding AddProjectCommand}"/>
+                        <Button Content="Annuler" Command="{Binding CloseAddProjectDialogCommand}"/>
+                    </StackPanel>
                 </StackPanel>
             </UserControl>
         </ResourceDictionary>
@@ -60,7 +69,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Button Grid.Row="0" 
-                Content="Ajouter un nouveau projet"
+                Content="Ajouter un nouveau projet" Width="Auto" HorizontalAlignment="Left" Margin="10"
                 Command="{Binding ShowAddProjectDialogCommand}"/>
         <TabControl Grid.Row="1" 
                     ItemsSource="{Binding PgmSettingVo.Projects}"

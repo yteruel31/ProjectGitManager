@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GitLabApiClient;
 using GitLabApiClient.Models;
 using GitLabApiClient.Models.Issues.Responses;
+using GitLabApiClient.Models.MergeRequests.Responses;
 using GitLabApiClient.Models.Projects.Responses;
 using PGM.Model;
 
@@ -54,25 +55,21 @@ namespace PGM.Service.Gitlab
 
         private void SetStepType(GitlabIssue gitlabIssue)
         {
-            if (gitlabIssue.Labels.Any(l => l == "En cours d'implémentation"))
+            if (gitlabIssue.IsClosed)
+            {
+                gitlabIssue.StepType = StepType.Done;
+            } 
+            else if (gitlabIssue.Labels.Any(l => l.Equals("En cours d'implémentation")))
             {
                 gitlabIssue.StepType = StepType.InProgress;
             }
-            else if (gitlabIssue.Labels.Any(l=> l == "À Valider"))
+            else if (gitlabIssue.Labels.Any(l=> l.Equals("À Valider")))
             {
                 gitlabIssue.StepType = StepType.ToValidate;
             }
-            else if(gitlabIssue.Labels.Any(l => l == "En cours de validation"))
+            else if(gitlabIssue.Labels.Any(l => l.Equals("En cours de validation")))
             {
                 gitlabIssue.StepType = StepType.Validating;
-            }
-            else if(gitlabIssue.IsClosed)
-            {
-                gitlabIssue.StepType = StepType.Done;
-            }
-            else
-            {
-                gitlabIssue.StepType = StepType.Backlog;
             }
         }
 
@@ -113,7 +110,9 @@ namespace PGM.Service.Gitlab
                     Title = issue.Milestone.Title
                 },
                 Assignees = GetGitlabAssignees(issue.Assignees),
-                Labels = issue.Labels
+                Labels = issue.Labels,
+                StepType = StepType.Backlog,
+                WebUrl = issue.WebUrl
             };
         }
 
@@ -139,43 +138,15 @@ namespace PGM.Service.Gitlab
                 }).ToList();
         }
 
-        private GitlabLabel GetGitlabLabel(Label label)
+        public async Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssue gitlabIssue, GitlabProject currentProject)
         {
-            return new GitlabLabel()
+            if (currentProject.Id == null)
             {
-                Id = label.Id,
-                Name = label.Name,
-                Color = label.Color,
-                Description = label.Description
-            };
-        }
-
-        private async Task<List<GitlabLabel>> GetAllRelatedLabelsFromCurrentIssue(Issue currentIssue,
-            GitlabProject currentProject)
-        {
-            IList<Label> labelsResult;
-
-            try
-            {
-                labelsResult = await _gitlabClientRepository.GetLabelsFromCurrentProject(currentProject);
-            }
-            catch (GitLabException)
-            {
-                return new List<GitlabLabel>();
+                return await Task.FromResult(false);
             }
 
-            IList<Label> labelsFromCurrentIssue = GetLabelsFromCurrentIssue(labelsResult, currentIssue).ToList();
-
-            List<GitlabLabel> gitlabLabels = new List<GitlabLabel>();
-
-            foreach (Label labelFromCurrentIssue in labelsFromCurrentIssue)
-            {
-                GitlabLabel gitlabLabel = GetGitlabLabel(labelFromCurrentIssue);
-
-                gitlabLabels.Add(gitlabLabel);
-            }
-
-            return gitlabLabels;
+            MergeRequest mergeRequest = await _gitlabClientRepository.GetMergeRequestFromCurrentIssue(gitlabIssue, currentProject);
+            return mergeRequest.Status == MergeStatus.CannotBeMerged;
         }
 
         public Task CreateMergeRequest(GitlabIssue currentIssue, GitlabProject currentProject)
@@ -211,16 +182,28 @@ namespace PGM.Service.Gitlab
             return GetGitlabProject(project);
         }
 
-        public Task<bool> ProjectExist(string projectId)
+        public Task<bool> GroupExist(string groupId)
         {
-            Task task = _gitlabClientRepository.GetProject(projectId);
-
-            if (task.IsCanceled || string.IsNullOrEmpty(projectId))
+            if (string.IsNullOrEmpty(groupId))
             {
                 return Task.FromResult(false);
             }
 
-            return Task.FromResult(true);
+            Task task = _gitlabClientRepository.GetGroup(groupId);
+
+            return Task.FromResult(!task.IsCanceled);
+        }
+
+        public Task<bool> ProjectExist(string projectId)
+        {
+            if (string.IsNullOrEmpty(projectId))
+            {
+                return Task.FromResult(false);
+            }
+
+            Task task = _gitlabClientRepository.GetProject(projectId);
+
+            return Task.FromResult(!task.IsCanceled);
         }
     }
 }

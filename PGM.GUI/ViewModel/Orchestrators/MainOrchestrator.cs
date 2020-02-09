@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using PGM.Model;
 using PGM.Service;
 using PGM.Service.Git;
@@ -28,10 +28,16 @@ namespace PGM.GUI.ViewModel.Orchestrators
             return _gitlabService.ProjectExist(projectId);
         }
 
+        public Task<bool> CheckIfGitlabGroupExist(string groupId)
+        {
+            return _gitlabService.GroupExist(groupId);
+        }
+
         public bool CheckIfGitDirectoryPathExist(string directoryPath)
         {
             return _fileSystemRepository.DirectoryExist(directoryPath + @"\.git");
         }
+
         public Task<GitlabProject> GetGitlabProject(string projectId)
         {
             return _gitlabService.GetProject(projectId);
@@ -45,5 +51,7 @@ namespace PGM.GUI.ViewModel.Orchestrators
         Task<GitlabProject> GetGitlabProject(string projectId);
 
         bool CheckIfGitDirectoryPathExist(string directoryPath);
+
+        Task<bool> CheckIfGitlabGroupExist(string groupId);
     }
 }

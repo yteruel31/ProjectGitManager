@@ -21,7 +21,8 @@ namespace PGM.GUI.ViewModel.Services
 
         public Task<MessageDialogResult> ShowOkCancel(string title, string message)
         {
-            return _dialogCoordinator.ShowMessageAsync(_subViewModelBase, title, message);
+
+            return _mainWindow.ShowMessageAsync(title, message);
         }
 
         public async Task<CustomDialog> ShowConfigSettings(string resourceName)
@@ -51,5 +52,7 @@ namespace PGM.GUI.ViewModel.Services
         Task<CustomDialog> ShowConfigSettings(string resourceName);
 
         Task CloseDialog(CustomDialog dialog);
+
+        Task<MessageDialogResult> ShowOkCancel(string title, string message);
     }
 }
