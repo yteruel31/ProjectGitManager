@@ -82,16 +82,16 @@ Task("GitCommitAndPush")
 	var repoPath = System.IO.Path.GetFullPath(".");
 	GitAddAll(repoPath);
 	GitCommit(repoPath, "Yoann TERUEL", "yoann.teruel@gmail.eu", "Update version");
+	GitPush(repoPath);
 });
 
 
 Task("Squirrel.Nuget")
 	.Does(() =>
 {
-	
+	CreateDirectory("./Deployment");
 	var assemblypath = "./PGM.GUI/Properties/AssemblyInfo.cs";
 	var assemblyInfo = ParseAssemblyInfo(assemblypath);
-
 	var version = assemblyInfo.AssemblyVersion;
 	version = version.Substring(0, version.Length - 2);
 
@@ -170,7 +170,6 @@ Task("Squirrel.FileCopy")
 });
 
 Task("Squirrel.Total")
-    .IsDependentOn("IncrementVersionNumber")
     .IsDependentOn("Build")
     .IsDependentOn("Squirrel.Nuget")
     .IsDependentOn("Squirrel.Packaging");
