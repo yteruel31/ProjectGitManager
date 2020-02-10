@@ -11,4 +11,4 @@ release:
     script:
         - .\build.ps1
     tags: 
-        - Windows
+        - shared-windows
