@@ -9,7 +9,7 @@ release:
         paths:
             - Release/*.*
     before_script:
-        - choco install dotnetfx
+        - choco install netfx-4.8-devpack
     script:
         - .\build.ps1
     tags: 
