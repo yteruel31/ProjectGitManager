@@ -12,3 +12,5 @@ release:
         - .\build.ps1
     tags: 
         - shared-windows
+        - windows
+        - windows-1809
