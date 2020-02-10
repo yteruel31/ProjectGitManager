@@ -4,8 +4,7 @@ stages:
 release:
     stage: deploy
     only:
-        refs:
-            - release
+        - tags
     artifacts:
         paths:
             - Release/*.*
