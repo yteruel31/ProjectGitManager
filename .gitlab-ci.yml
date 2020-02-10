@@ -1,0 +1,15 @@
+stages:
+  - deploy
+
+release:
+    stage: deploy
+    only:
+        refs:
+            - release
+    artifacts:
+        paths:
+            - Release/*.*
+    script:
+        - .\build.ps1
+    tags: 
+        - Windows
