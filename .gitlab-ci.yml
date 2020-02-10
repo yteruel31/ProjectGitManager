@@ -8,6 +8,8 @@ release:
     artifacts:
         paths:
             - Release/*.*
+    before_script:
+        - choco install dotnetfx
     script:
         - .\build.ps1
     tags: 
