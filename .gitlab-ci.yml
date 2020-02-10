@@ -7,7 +7,7 @@ release:
         - tags
     artifacts:
         paths:
-            - Release/*.*
+            - Release/*
     before_script:
         - choco install netfx-4.8-devpack -y
     script:
