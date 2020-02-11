@@ -133,8 +133,11 @@ namespace PGM.GUI.ViewModel
 
         private async Task TestActualBranch()
         {
-            await _projectContentOrchestrator.TestActualBranch(SelectedIssue, CurrentProject);
-            LoadIssues(CurrentProject);
+            if (SelectedIssue != null)
+            {
+                await _projectContentOrchestrator.TestActualBranch(SelectedIssue, CurrentProject);
+                LoadIssues(CurrentProject);
+            }
         }
 
         public ICollectionView GroupedIssues
