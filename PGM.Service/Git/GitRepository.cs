@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using LibGit2Sharp;
 using NLog;
 using PGM.Model;
@@ -14,7 +15,7 @@ namespace PGM.Service.Git
         private Branch UpStreamMasterBranch => _repository.Branches["origin/master"];
         private Remote OriginRemote => _repository.Network.Remotes["origin"];
         private string Email => Settings.Email;
-        private IPgmSettingManagerService _pgmSettingManagerService;
+        private readonly IPgmSettingManagerService _pgmSettingManagerService;
         private PGMSetting Settings => _pgmSettingManagerService.CurrentSettings;
         private Repository _repository;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -63,7 +64,11 @@ namespace PGM.Service.Git
         {
             try
             {
-                _repository.CreateBranch($"issue/{issueId}");
+                if (_repository.Branches.All(b => b.FriendlyName != $"issue/{issueId}"))
+                {
+                    _repository.CreateBranch($"issue/{issueId}");
+                }
+
                 Branch branch = _repository.Branches[$"issue/{issueId}"];
                 _repository.Branches.Update(branch,
                     b => b.Remote = OriginRemote.Name, b => b.UpstreamBranch = branch.CanonicalName);
