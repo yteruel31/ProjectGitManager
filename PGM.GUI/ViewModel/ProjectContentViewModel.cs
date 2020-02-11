@@ -111,8 +111,11 @@ namespace PGM.GUI.ViewModel
 
         private async Task CreateMergeRequest()
         {
-            await _projectContentOrchestrator.CreateMergeRequestActualBranch(SelectedIssue, CurrentProject);
-            LoadIssues(CurrentProject);
+            if (SelectedIssue != null)
+            {
+                await _projectContentOrchestrator.CreateMergeRequestActualBranch(SelectedIssue, CurrentProject);
+                LoadIssues(CurrentProject);
+            }
         }
 
         private bool CanCreateBranch()
@@ -122,8 +125,11 @@ namespace PGM.GUI.ViewModel
 
         private async Task CreateBranch()
         {
-            await _projectContentOrchestrator.CreateNewBranch(SelectedIssue, CurrentProject);
-            LoadIssues(CurrentProject);
+            if (SelectedIssue != null)
+            {
+                await _projectContentOrchestrator.CreateNewBranch(SelectedIssue, CurrentProject);
+                LoadIssues(CurrentProject);
+            }
         }
 
         private bool CanTestActualBranch()
@@ -181,7 +187,7 @@ namespace PGM.GUI.ViewModel
         {
             if (currentProjectVo != null)
             {
-                _projectContentOrchestrator.SetupRepositoryOnCurrentProject(currentProjectVo.RepositoryPath);
+                _projectContentOrchestrator.SetupRepositoryOnCurrentProject(currentProjectVo);
                 List<GitlabIssueVO> gitlabIssueVos = await _projectContentOrchestrator.GetGitlabIssue(currentProjectVo);
                 gitlabIssueVos = gitlabIssueVos.OrderBy(i => (int) i.StepType).ToList();
 

@@ -12,9 +12,9 @@ namespace PGM.Service.Git
             _gitRepository = gitRepository;
         }
 
-        public void SetupRepositoryOnCurrentProject(string repositoryPath)
+        public void SetupRepositoryOnCurrentProject(GitlabProject currentProject)
         {
-            _gitRepository.SetupRepository(repositoryPath);
+            _gitRepository.SetupRepository(currentProject);
         }
 
         public void CreateBranchLinkedWithIssue(GitlabIssue issue)

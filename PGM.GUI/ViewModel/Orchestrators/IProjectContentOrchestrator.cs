@@ -15,7 +15,7 @@ namespace PGM.GUI.ViewModel.Orchestrators
 
         Task TestActualBranch(GitlabIssueVO issueVo, ProjectVO projectVo);
 
-        void SetupRepositoryOnCurrentProject(string repositoryPath);
+        void SetupRepositoryOnCurrentProject(ProjectVO projectVo);
 
         Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssueVO issueVo, ProjectVO projectVo);
     }

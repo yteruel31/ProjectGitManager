@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using LibGit2Sharp;
 using NLog;
 using PGM.Model;
@@ -14,7 +15,7 @@ namespace PGM.Service.Git
         private Branch UpStreamMasterBranch => _repository.Branches["origin/master"];
         private Remote OriginRemote => _repository.Network.Remotes["origin"];
         private string Email => Settings.Email;
-        private IPgmSettingManagerService _pgmSettingManagerService;
+        private readonly IPgmSettingManagerService _pgmSettingManagerService;
         private PGMSetting Settings => _pgmSettingManagerService.CurrentSettings;
         private Repository _repository;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -25,12 +26,15 @@ namespace PGM.Service.Git
             _pgmSettingManagerService = pgmSettingManagerService;
         }
 
-        public void SetupRepository(string repositoryPath)
+        public void SetupRepository(GitlabProject currentProject)
         {
-            if (repositoryPath != null)
+            if (currentProject.RepositoryPath == null)
             {
-                _repository = new Repository(repositoryPath);
+                return;
             }
+
+            Settings.CurrentGitlabProject = currentProject;
+            _repository = new Repository(currentProject.RepositoryPath);
         }
 
         public GitResult<Branch> CheckoutMaster()
@@ -60,7 +64,11 @@ namespace PGM.Service.Git
         {
             try
             {
-                _repository.CreateBranch($"issue/{issueId}");
+                if (_repository.Branches.All(b => b.FriendlyName != $"issue/{issueId}"))
+                {
+                    _repository.CreateBranch($"issue/{issueId}");
+                }
+
                 Branch branch = _repository.Branches[$"issue/{issueId}"];
                 _repository.Branches.Update(branch,
                     b => b.Remote = OriginRemote.Name, b => b.UpstreamBranch = branch.CanonicalName);
@@ -155,7 +163,7 @@ namespace PGM.Service.Git
                 }
                 else
                 {
-                    Process.Start("git", $"push --force");
+                    GetGitProcess($"push origin {branch.FriendlyName} --force").Start();
                 }
                
                 return new GitResult(true, "OK");
@@ -164,6 +172,26 @@ namespace PGM.Service.Git
             {
                 return new GitResult(false, e);
             }
+        }
+
+        private Process GetGitProcess(string args)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo("git.exe")
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                WorkingDirectory = Settings.CurrentGitlabProject.RepositoryPath,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                Arguments = args,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+
+            return new Process
+            {
+                StartInfo = startInfo
+            };
         }
 
         public GitResult DeleteLocalBranch(Branch branch)

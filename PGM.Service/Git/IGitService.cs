@@ -8,7 +8,7 @@ namespace PGM.Service.Git
 
         void CheckoutOnBranch(bool isMasterBranch, GitlabIssue issue = null);
 
-        void SetupRepositoryOnCurrentProject(string repositoryPath);
+        void SetupRepositoryOnCurrentProject(GitlabProject currentProject);
 
         void RebaseActualBranchOntoMaster(GitlabIssue issue);
     }
