@@ -112,25 +112,24 @@ namespace PGM.Service.Gitlab
             return _client.Projects.GetLabelsAsync(project.Id);
         }
 
-        public async Task SetLabelOnCurrentIssue(GitlabIssue issue, GitlabProject project, string labelName)
+        public async Task SetLabelOnCurrentIssue(GitlabIssue issue, GitlabProject project, string labelNameToAdd = null, string labelNameToRemove = null)
         {
             Issue currentIssue = await GetIssue(project, issue);
             List<string> labels = currentIssue.Labels;
-            labels.Add(labelName);
+
+            if (labelNameToRemove != null)
+            {
+                labels.Add(labelNameToAdd);
+            }
+
+            if (labelNameToRemove != null)
+            {
+                labels.Remove(labelNameToRemove);
+            }
+
             await _client.Issues.UpdateAsync(project.Id, currentIssue.Iid, new UpdateIssueRequest
             {
                 Labels = labels
-            });
-        }
-
-        public async Task RemoveLabelOnCurrentIssue(GitlabIssue issue, GitlabProject project, string labelName)
-        {
-            Issue currentIssue = await GetIssue(project, issue);
-            List<string> labels = currentIssue.Labels;
-            labels.Remove(labelName);
-            await _client.Issues.UpdateAsync(project.Id, currentIssue.Iid, new UpdateIssueRequest
-            {
-                Labels = new List<string>()
             });
         }
 

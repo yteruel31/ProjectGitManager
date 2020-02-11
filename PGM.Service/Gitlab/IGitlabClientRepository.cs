@@ -32,9 +32,8 @@ namespace PGM.Service.Gitlab
 
         Task<Issue> GetIssue(GitlabProject project, GitlabIssue issue);
 
-        Task RemoveLabelOnCurrentIssue(GitlabIssue issue, GitlabProject project, string labelName);
-
-        Task SetLabelOnCurrentIssue(GitlabIssue issue, GitlabProject project, string labelName);
+        Task SetLabelOnCurrentIssue(GitlabIssue issue, GitlabProject project, string labelNameToAdd = null,
+            string labelNameToRemove = null);
 
         Task SetAssigneeOnMergeRequest(GitlabIssue gitlabIssue, GitlabProject project);
     }
