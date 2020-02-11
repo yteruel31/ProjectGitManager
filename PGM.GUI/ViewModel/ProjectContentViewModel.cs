@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -181,7 +181,7 @@ namespace PGM.GUI.ViewModel
         {
             if (currentProjectVo != null)
             {
-                _projectContentOrchestrator.SetupRepositoryOnCurrentProject(currentProjectVo.RepositoryPath);
+                _projectContentOrchestrator.SetupRepositoryOnCurrentProject(currentProjectVo);
                 List<GitlabIssueVO> gitlabIssueVos = await _projectContentOrchestrator.GetGitlabIssue(currentProjectVo);
                 gitlabIssueVos = gitlabIssueVos.OrderBy(i => (int) i.StepType).ToList();
 

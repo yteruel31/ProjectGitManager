@@ -1,4 +1,5 @@
 ﻿using LibGit2Sharp;
+using PGM.Model;
 
 namespace PGM.Service.Git
 {
@@ -20,6 +21,6 @@ namespace PGM.Service.Git
 
         GitResult<Branch> CheckoutMaster();
 
-        void SetupRepository(string repositoryPath);
+        void SetupRepository(GitlabProject currentProject);
     }
 }

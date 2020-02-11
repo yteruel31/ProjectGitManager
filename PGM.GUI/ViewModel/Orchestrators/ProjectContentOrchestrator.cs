@@ -24,9 +24,10 @@ namespace PGM.GUI.ViewModel.Orchestrators
             _mapperVoToModel = mapperVoToModel;
         }
 
-        public void SetupRepositoryOnCurrentProject(string repositoryPath)
+        public void SetupRepositoryOnCurrentProject(ProjectVO projectVo)
         {
-            _gitService.SetupRepositoryOnCurrentProject(repositoryPath);
+            GitlabProject currentProject = _mapperVoToModel.Mapper.Map<GitlabProject>(projectVo);
+            _gitService.SetupRepositoryOnCurrentProject(currentProject);
         }
 
         public async Task ValidateActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)

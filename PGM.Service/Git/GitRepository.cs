@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using LibGit2Sharp;
@@ -25,12 +25,15 @@ namespace PGM.Service.Git
             _pgmSettingManagerService = pgmSettingManagerService;
         }
 
-        public void SetupRepository(string repositoryPath)
+        public void SetupRepository(GitlabProject currentProject)
         {
-            if (repositoryPath != null)
+            if (currentProject.RepositoryPath == null)
             {
-                _repository = new Repository(repositoryPath);
+                return;
             }
+
+            Settings.CurrentGitlabProject = currentProject;
+            _repository = new Repository(currentProject.RepositoryPath);
         }
 
         public GitResult<Branch> CheckoutMaster()
@@ -155,7 +158,7 @@ namespace PGM.Service.Git
                 }
                 else
                 {
-                    Process.Start("git", $"push --force");
+                    GetGitProcess($"push origin {branch.FriendlyName} --force").Start();
                 }
                
                 return new GitResult(true, "OK");
@@ -164,6 +167,26 @@ namespace PGM.Service.Git
             {
                 return new GitResult(false, e);
             }
+        }
+
+        private Process GetGitProcess(string args)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo("git.exe")
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                WorkingDirectory = Settings.CurrentGitlabProject.RepositoryPath,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                Arguments = args,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+
+            return new Process
+            {
+                StartInfo = startInfo
+            };
         }
 
         public GitResult DeleteLocalBranch(Branch branch)
