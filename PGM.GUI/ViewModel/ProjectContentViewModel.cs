@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -111,8 +111,11 @@ namespace PGM.GUI.ViewModel
 
         private async Task CreateMergeRequest()
         {
-            await _projectContentOrchestrator.CreateMergeRequestActualBranch(SelectedIssue, CurrentProject);
-            LoadIssues(CurrentProject);
+            if (SelectedIssue != null)
+            {
+                await _projectContentOrchestrator.CreateMergeRequestActualBranch(SelectedIssue, CurrentProject);
+                LoadIssues(CurrentProject);
+            }
         }
 
         private bool CanCreateBranch()
@@ -122,8 +125,11 @@ namespace PGM.GUI.ViewModel
 
         private async Task CreateBranch()
         {
-            await _projectContentOrchestrator.CreateNewBranch(SelectedIssue, CurrentProject);
-            LoadIssues(CurrentProject);
+            if (SelectedIssue != null)
+            {
+                await _projectContentOrchestrator.CreateNewBranch(SelectedIssue, CurrentProject);
+                LoadIssues(CurrentProject);
+            }
         }
 
         private bool CanTestActualBranch()

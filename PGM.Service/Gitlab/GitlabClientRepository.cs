@@ -117,14 +117,14 @@ namespace PGM.Service.Gitlab
             Issue currentIssue = await GetIssue(project, issue);
             List<string> labels = currentIssue.Labels;
 
-            if (labelNameToRemove != null)
+            if (labelNameToAdd != null)
             {
                 labels.Add(labelNameToAdd);
             }
 
             if (labelNameToRemove != null)
             {
-                labels.Remove(labelNameToRemove);
+                labels.RemoveAt(labels.IndexOf(labelNameToRemove));
             }
 
             await _client.Issues.UpdateAsync(project.Id, currentIssue.Iid, new UpdateIssueRequest
