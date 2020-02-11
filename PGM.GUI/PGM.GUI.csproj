@@ -250,6 +250,7 @@
     <Compile Include="ViewModel\ProjectContentViewModel.cs" />
     <Compile Include="ViewModel\ProjectVO.cs" />
     <Compile Include="ViewModel\Services\DialogCoordinatorService.cs" />
+    <Compile Include="ViewModel\Services\SquirrelService.cs" />
     <Compile Include="ViewModel\StepTypeVO.cs" />
     <Compile Include="ViewModel\SubViewModelBase.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />

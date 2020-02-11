@@ -81,15 +81,13 @@ namespace PGM.Service.Gitlab
                     await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, project, "En cours d'implémentation");
                     break;
                 case StepType.ToValidate:
-                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, project, "À Valider");
-                    await _gitlabClientRepository.RemoveLabelOnCurrentIssue(issue, project, "En cours d'implémentation");
+                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, project, "À Valider", "En cours d'implémentation");
                     break;
                 case StepType.Validating:
-                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, project, "En cours de validation");
-                    await _gitlabClientRepository.RemoveLabelOnCurrentIssue(issue, project, "À Valider");
+                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, project, "En cours de validation", "À Valider");
                     break;
                 case StepType.Done:
-                    await _gitlabClientRepository.RemoveLabelOnCurrentIssue(issue, project, "En cours de validation");
+                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, project, null, "En cours de validation");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

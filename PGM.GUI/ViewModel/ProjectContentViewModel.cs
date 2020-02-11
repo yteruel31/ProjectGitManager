@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using MahApps.Metro.Controls;
 using PGM.GUI.Utilities;
 using PGM.GUI.ViewModel.Orchestrators;
 using PGM.GUI.ViewModel.Services;
@@ -66,10 +67,11 @@ namespace PGM.GUI.ViewModel
             (_createMergeRequestOnGitlabCommand = CommandFactory.CreateAsync(CreateMergeRequest, CanCreateMergeRequest,
                 nameof(CreateMergeRequestOnGitlabCommand), this));
 
-        public ProjectContentViewModel(IProjectContentOrchestrator projectContentOrchestrator)
+        public ProjectContentViewModel(IProjectContentOrchestrator projectContentOrchestrator, IDialogCoordinatorService dialogCoordinatorService)
         {
             _projectContentOrchestrator = projectContentOrchestrator;
-            _dialogCoordinatorService = new DialogCoordinatorService(this);
+            _dialogCoordinatorService = dialogCoordinatorService;
+            _dialogCoordinatorService.MainWindow = (MetroWindow)Application.Current.MainWindow;
         }
 
         public ICommand ValidateActualBranchCommand =>
@@ -131,8 +133,11 @@ namespace PGM.GUI.ViewModel
 
         private async Task TestActualBranch()
         {
-            await _projectContentOrchestrator.TestActualBranch(SelectedIssue, CurrentProject);
-            LoadIssues(CurrentProject);
+            if (SelectedIssue != null)
+            {
+                await _projectContentOrchestrator.TestActualBranch(SelectedIssue, CurrentProject);
+                LoadIssues(CurrentProject);
+            }
         }
 
         public ICollectionView GroupedIssues

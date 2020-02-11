@@ -48,7 +48,6 @@ namespace PGM.Service.Git
                 }
 
                 _gitRepository.CheckoutIssueBranch(issue.Id.ToString());
-                _gitRepository.PullOnRepository();
             }
         }
     }

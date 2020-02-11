@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using PGM.GUI.AutoMapper;
 using PGM.GUI.Utilities;
@@ -58,12 +59,13 @@ namespace PGM.GUI.ViewModel
 
         public MainViewModel(IMapperVoToModel mapperVoToModel, 
             IPgmService pgmService, 
-            IMainOrchestrator mainOrchestrator)
+            IMainOrchestrator mainOrchestrator, IDialogCoordinatorService dialogCoordinatorService)
         {
             _mapperVoToModel = mapperVoToModel;
            _pgmService = pgmService;
            _mainOrchestrator = mainOrchestrator;
-           _dialogCoordinatorService = new DialogCoordinatorService(this);
+           _dialogCoordinatorService = dialogCoordinatorService;
+           _dialogCoordinatorService.MainWindow = (MetroWindow) Application.Current.MainWindow;
         }
 
         private bool CanShowAddProjectDialog()
@@ -189,35 +191,6 @@ namespace PGM.GUI.ViewModel
                     _setupSettingsDialog = await _dialogCoordinatorService.ShowConfigSettings("SetupSettingsDialog");
                 }
             }
-
-            await CheckSquirrelUpdate();
-        }
-
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private async Task CheckSquirrelUpdate()
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-        {
-#if !DEBUG
-            using (UpdateManager mgr = new UpdateManager($"https://gitlab.com/api/v4/projects/15819035/jobs/artifacts/release/raw/Release?job=release"))
-            {
-                UpdateInfo updateInfo = await mgr.CheckForUpdate();
-                if (updateInfo.ReleasesToApply.Any())
-                {
-                    await mgr.UpdateApp();
-
-                    await _dialogCoordinatorService.ShowOkCancel("New Version", $"New version ({updateInfo.FutureReleaseEntry.Version}) !");
-                    mgr.KillAllExecutablesBelongingToPackage();
-
-                    string currentProcessPath = Process.GetCurrentProcess().MainModule.FileName;
-                    FileInfo fileInfo = new FileInfo(currentProcessPath);
-                    DirectoryInfo di = fileInfo.Directory;
-                    FileInfo fileToLaunch = di.Parent.GetFiles(fileInfo.Name).FirstOrDefault();
-                    currentProcessPath = fileToLaunch?.FullName ?? currentProcessPath;
-                    Process.Start(currentProcessPath, Guid.NewGuid().ToString());
-                    Application.Current.Shutdown();
-                }
-            }
-#endif
         }
     }
 }
