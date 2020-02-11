@@ -57,6 +57,11 @@ namespace PGM.GUI.ViewModel
                 .InstancePerLifetimeScope();
 
             containerBuilder.RegisterAssemblyTypes(assembly)
+                .Where(t => t.Name.EndsWith("Service"))
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            containerBuilder.RegisterAssemblyTypes(assembly)
                 .Where(t => t.Name.EndsWith("Orchestrator"))
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
