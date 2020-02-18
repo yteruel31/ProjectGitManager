@@ -1,6 +1,9 @@
-name: CI
+name: Buid & Create Artifacts
 
-on: [push]
+on:
+  push:
+    tags:
+    - '*'
 
 jobs:
   build:
