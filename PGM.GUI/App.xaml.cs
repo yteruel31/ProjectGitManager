@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using PGM.GUI.ViewModel;
+using PGM.GUI.ViewModel.Services;
 
 namespace PGM.GUI
 {
@@ -12,6 +13,11 @@ namespace PGM.GUI
         {
             PgmServiceLocator.Initialise();
             base.OnStartup(e);
+        }
+
+        private void App_OnStartup(object sender, StartupEventArgs e)
+        {
+            PgmServiceLocator.Current.GetInstance<ISquirrelService>().AutoUpdate();
         }
     }
 }
