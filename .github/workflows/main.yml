@@ -8,6 +8,7 @@ jobs:
     steps:
     - name: Install .Net Framework 4.8
       run: choco install netfx-4.8-devpack -y
+    - uses: actions/checkout@master
     - name: Run Build
       run: .\build.ps1
       shell: powershell
