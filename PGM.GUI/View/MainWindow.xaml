@@ -65,26 +65,38 @@
     </I:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition />
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Button Grid.Row="0" 
-                Content="Ajouter un nouveau projet" Width="Auto" HorizontalAlignment="Left" Margin="10"
-                Command="{Binding ShowAddProjectDialogCommand}"/>
-        <TabControl Grid.Row="1" 
-                    ItemsSource="{Binding PgmSettingVo.Projects}"
-                    mah:TabControlHelper.Underlined="TabPanel" 
-                    mah:ControlsHelper.HeaderFontSize="10">
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}"/>
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
-                <DataTemplate>
-                    <view:ProjectContentControl DataContext="{Binding Context}"/>
-                </DataTemplate>
-            </TabControl.ContentTemplate>
-        </TabControl>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" 
+                    Content="Ajouter un nouveau projet" Width="Auto" HorizontalAlignment="Left" Margin="10"
+                    Command="{Binding ShowAddProjectDialogCommand}"/>
+            <TabControl Grid.Row="1" 
+                        ItemsSource="{Binding PgmSettingVo.Projects}"
+                        mah:TabControlHelper.Underlined="TabPanel" 
+                        mah:ControlsHelper.HeaderFontSize="10">
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <view:ProjectContentControl DataContext="{Binding Context}"/>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+        </Grid>
+        <StatusBar Grid.Row="1" >
+            <StatusBarItem Content="PGM" />
+            <Separator Style="{DynamicResource MetroStatusBarSeparator}" />
+            <StatusBarItem Content="Version" />
+            <StatusBarItem Content="{Binding AppVersion}" />
+        </StatusBar>
     </Grid>
 </mah:MetroWindow>

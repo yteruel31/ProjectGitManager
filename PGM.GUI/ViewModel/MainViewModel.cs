@@ -145,6 +145,16 @@ namespace PGM.GUI.ViewModel
             }
         }
 
+        public string AppVersion
+        {
+            get
+            {
+                Assembly assembly = Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly();
+                Version appVersion = assembly.GetName().Version;
+                return $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Build}";
+            }
+        }
+
         public ProjectVO ProjectVo
         {
             get { return _projectVo; }
