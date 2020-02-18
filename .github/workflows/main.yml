@@ -10,6 +10,7 @@ jobs:
       run: choco install netfx-4.8-devpack -y
     - name: Run Build
       run: .\build.ps1
+      shell: powershell
     - uses: actions/upload-artifact@v1
       with:
         name: pgm-artifact
