@@ -1,4 +1,4 @@
-<mah:MetroWindow x:Class="PGM.GUI.View.MainWindow"
+﻿<mah:MetroWindow x:Class="PGM.GUI.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -17,7 +17,7 @@
             <UserControl x:Key="SetupSettingsDialog"
                          MinHeight="200">
                 <StackPanel>
-                    <Label Content="Veuillez remplir les champs suivants :" />
+                    <Label Content="Fill the following fields:" />
                     <TextBlock Text="GitLab API Key"/>
                     <TextBox Text="{Binding PgmSettingVo.GitLabApiKey}" />
                     <TextBlock Text="Username Gitlab"/>
@@ -36,21 +36,21 @@
             </UserControl>
             <UserControl x:Key="AddProjectDialog">
                 <StackPanel>
-                    <Label Content="Veuillez remplir les champs suivants :" />
-                    <TextBlock Text="Id du projet"/>
+                    <Label Content="Fill the following fields:" />
+                    <TextBlock Text="ID of Gitlab Project"/>
                     <TextBox Text="{Binding ProjectVo.Id}" />
-                    <TextBlock Text="Répertoire"/>
+                    <TextBlock Text="Repository Path"/>
                     <TextBox Text="{Binding ProjectVo.RepositoryPath}"/>
-                    <CheckBox Content="Le projet est dans un groupe ?" IsChecked="{Binding GroupFieldIsVisible}"/>
+                    <CheckBox Content="Project is in a Gitlab group?" IsChecked="{Binding GroupFieldIsVisible}"/>
                     <TextBlock 
-                        Text="Id du groupe" 
+                        Text="ID of Gitlab Group" 
                         Visibility="{Binding GroupFieldIsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     <TextBox 
                         Text="{Binding ProjectVo.GroupId}"
                         Visibility="{Binding GroupFieldIsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Ajouter" Command="{Binding AddProjectCommand}"/>
-                        <Button Content="Annuler" Command="{Binding CloseAddProjectDialogCommand}"/>
+                        <Button Content="Add" Command="{Binding AddProjectCommand}"/>
+                        <Button Content="Cancel" Command="{Binding CloseAddProjectDialogCommand}"/>
                     </StackPanel>
                 </StackPanel>
             </UserControl>
@@ -75,7 +75,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Button Grid.Row="0" 
-                    Content="Ajouter un nouveau projet" Width="Auto" HorizontalAlignment="Left" Margin="10"
+                    Content="Add new project" Width="Auto" HorizontalAlignment="Left" Margin="10"
                     Command="{Binding ShowAddProjectDialogCommand}"/>
             <TabControl Grid.Row="1" 
                         ItemsSource="{Binding PgmSettingVo.Projects}"

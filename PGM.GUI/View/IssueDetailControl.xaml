@@ -16,14 +16,14 @@
                 Padding="20" 
                 Margin="20">
                 <StackPanel>
-                    <Button Content="Voir sur GitLab"
+                    <Button Content="View on Gitlab"
                             HorizontalAlignment="Left"
                             Command="{Binding OpenLinkInBrowserCommand}" 
                             DataContext="{Binding Source={StaticResource Locator}, Path=MainPgm.ProjectVo.Context}" 
                             Width="100" Margin="0 0 0 10" />
                     <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold" />
                     <StackPanel Orientation="Horizontal" Margin="10">
-                        <TextBlock Text="Assigné à :" Padding="5" />
+                        <TextBlock Text="Assign on :" Padding="5" />
                         <ListBox ItemsSource="{Binding Assignees}" HorizontalContentAlignment="Left">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
