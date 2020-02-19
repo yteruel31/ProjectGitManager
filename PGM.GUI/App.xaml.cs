@@ -17,7 +17,9 @@ namespace PGM.GUI
 
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
+#if !DEBUG
             PgmServiceLocator.Current.GetInstance<ISquirrelService>().AutoUpdate();
+#endif
         }
     }
 }

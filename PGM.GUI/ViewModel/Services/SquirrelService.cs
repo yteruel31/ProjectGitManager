@@ -27,6 +27,7 @@ namespace PGM.GUI.ViewModel.Services
                 await UpdateManager.GitHubUpdateManager("https://github.com/yteruel31/projectgitmanager"))
             {
                 UpdateInfo updateInfo = await updateManager.CheckForUpdate();
+                
                 if (updateInfo.ReleasesToApply.Any())
                 {
                     await updateManager.UpdateApp();
@@ -35,13 +36,14 @@ namespace PGM.GUI.ViewModel.Services
                     updateManager.KillAllExecutablesBelongingToPackage();
 
                     ProcessModule processModule = Process.GetCurrentProcess().MainModule;
+                    
                     if (processModule != null)
                     {
                         string currentProcessPath = processModule.FileName;
                         FileInfo fileInfo = new FileInfo(currentProcessPath);
-                        DirectoryInfo di = fileInfo.Directory;
-                        FileInfo fileToLaunch = di.Parent.GetFiles(fileInfo.Name).FirstOrDefault();
-                        currentProcessPath = fileToLaunch?.FullName ?? currentProcessPath;
+                        DirectoryInfo directory = fileInfo.Directory;
+                        FileInfo fileToLaunch = directory?.Parent?.GetFiles(fileInfo.Name).FirstOrDefault();
+                            currentProcessPath = fileToLaunch?.FullName ?? currentProcessPath;
                         Process.Start(currentProcessPath, Guid.NewGuid().ToString());
                     }
 
