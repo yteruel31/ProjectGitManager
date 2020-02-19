@@ -55,37 +55,6 @@ Task("Build")
     }
 });
 
-Task("IncrementVersionNumber")
-	.Does(() => 
-{
-	
-	var assemblypath = "./PGM.GUI/Properties/AssemblyInfo.cs";
-	var assemblyInfo = ParseAssemblyInfo(assemblypath);
-
-	var oldVersion = assemblyInfo.AssemblyVersion;
-	var versions= oldVersion.Split('.');
-	var newVersion = versions[0] + "." + versions[1] + "." + (int.Parse(versions[2])+1) + ".0";
-
-	Information("OldVersion: {0}, new Version: {1}", oldVersion, newVersion);
-
-    ReplaceRegexInFiles(assemblypath, 
-                           "(?<=AssemblyVersion\\(\")(.+?)(?=\"\\))", 
-                           newVersion);
-    ReplaceRegexInFiles(assemblypath, 
-                           "(?<=AssemblyFileVersion\\(\")(.+?)(?=\"\\))", 
-                           newVersion);
-});
-
-Task("GitCommitAndPush")
-	.Does(() =>
-{
-	var repoPath = System.IO.Path.GetFullPath(".");
-	GitAddAll(repoPath);
-	GitCommit(repoPath, "Yoann TERUEL", "yoann.teruel@gmail.eu", "Update version");
-	GitPush(repoPath);
-});
-
-
 Task("Squirrel.Nuget")
 	.Does(() =>
 {
@@ -155,7 +124,9 @@ Task("Squirrel.Packaging")
 
 	var settings = new SquirrelSettings();
 	settings.ReleaseDirectory = @"./Release";
-	Information($"Chemin : {settings.ReleaseDirectory}");
+	settings.Icon = "PGM.GUI/Resources/PGM.ico";
+
+	Information($"Path : {settings.ReleaseDirectory}");
 
 	Squirrel(package, settings);
 });
