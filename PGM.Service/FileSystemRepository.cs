@@ -13,7 +13,7 @@ namespace PGM.Service
 
         private string GetFolderPath()
         {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PGM");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PGM");
         }
 
         public bool FileExist(string filePath)
