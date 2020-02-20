@@ -39,7 +39,7 @@ namespace PGM.Service.Gitlab
             {
                 if (issue.Milestone != null)
                 {
-                    GitlabIssue gitlabIssue = GetGitlabIssue(issue, project);
+                    GitlabIssue gitlabIssue = GetGitlabIssue(issue);
                     SetStepType(gitlabIssue);
                     if (gitlabIssue.Milestone.Id != issue.Milestone.Id)
                     {
@@ -73,28 +73,28 @@ namespace PGM.Service.Gitlab
             }
         }
 
-        public async Task AssignCorrectLabelRelatedToCurrentIssue(GitlabIssue issue, GitlabProject project, StepType stepType)
+        public async Task AssignCorrectLabelRelatedToCurrentIssue(GitlabIssue issue, StepType stepType)
         {
             switch (stepType)
             {
                 case StepType.InProgress:
-                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, project, "En cours d'implémentation");
+                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, issue.CurrentProject, "En cours d'implémentation");
                     break;
                 case StepType.ToValidate:
-                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, project, "À Valider", "En cours d'implémentation");
+                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, issue.CurrentProject, "À Valider", "En cours d'implémentation");
                     break;
                 case StepType.Validating:
-                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, project, "En cours de validation", "À Valider");
+                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, issue.CurrentProject, "En cours de validation", "À Valider");
                     break;
                 case StepType.Done:
-                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, project, null, "En cours de validation");
+                    await _gitlabClientRepository.SetLabelOnCurrentIssue(issue, issue.CurrentProject, null, "En cours de validation");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private GitlabIssue GetGitlabIssue(Issue issue, GitlabProject currentProject)
+        private GitlabIssue GetGitlabIssue(Issue issue)
         {
             return new GitlabIssue()
             {
@@ -136,21 +136,21 @@ namespace PGM.Service.Gitlab
                 }).ToList();
         }
 
-        public async Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssue gitlabIssue, GitlabProject currentProject)
+        public async Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssue gitlabIssue)
         {
-            if (currentProject.Id == null)
+            if (gitlabIssue.CurrentProject.Id == null)
             {
                 return await Task.FromResult(false);
             }
 
-            MergeRequest mergeRequest = await _gitlabClientRepository.GetMergeRequestFromCurrentIssue(gitlabIssue, currentProject);
+            MergeRequest mergeRequest = await _gitlabClientRepository.GetMergeRequestFromCurrentIssue(gitlabIssue, gitlabIssue.CurrentProject);
             return mergeRequest.Status == MergeStatus.CannotBeMerged;
         }
 
-        public Task CreateMergeRequest(GitlabIssue currentIssue, GitlabProject currentProject)
+        public Task CreateMergeRequest(GitlabIssue issue)
         {
-            string mrTitle = $"Issue/{currentIssue.Id} - {currentIssue.Title}";
-            return _gitlabClientRepository.PostMergeRequest($"issue/{currentIssue.Id}", mrTitle, currentIssue, currentProject);
+            string mrTitle = $"Issue/{issue.Id} - {issue.Title}";
+            return _gitlabClientRepository.PostMergeRequest($"issue/{issue.Id}", mrTitle, issue, issue.CurrentProject);
         }
 
         private IEnumerable<Label> GetLabelsFromCurrentIssue(IList<Label> labelsResult, Issue currentIssue)
@@ -158,25 +158,25 @@ namespace PGM.Service.Gitlab
             return labelsResult.Where(l => currentIssue.Labels.Contains(l.Name));
         }
 
-        public async Task SetAssigneeOnCurrentIssue(GitlabIssue issue, GitlabProject project)
+        public async Task SetAssigneeOnCurrentIssue(GitlabIssue issue)
         {
             Assignee assignee = await _gitlabClientRepository.GetAssigneeFromCurrentUser();
-            await _gitlabClientRepository.SetAssigneeOnCurrentIssue(issue, assignee, project);
+            await _gitlabClientRepository.SetAssigneeOnCurrentIssue(issue, assignee, issue.CurrentProject);
         }
 
-        public Task SetAssigneeOnMergeRequest(GitlabIssue issue, GitlabProject project)
+        public Task SetAssigneeOnMergeRequest(GitlabIssue issue)
         {
-            return _gitlabClientRepository.SetAssigneeOnMergeRequest(issue, project);
+            return _gitlabClientRepository.SetAssigneeOnMergeRequest(issue, issue.CurrentProject);
         }
 
-        public Task SetMilestoneOnMergeRequest(GitlabIssue issue, GitlabProject project)
+        public Task SetMilestoneOnMergeRequest(GitlabIssue issue)
         {
-            return _gitlabClientRepository.SetMilestoneOnMergeRequest(issue, project);
+            return _gitlabClientRepository.SetMilestoneOnMergeRequest(issue, issue.CurrentProject);
         }
 
-        public Task ValidateMergeRequest(GitlabIssue issue, GitlabProject currentProject)
+        public Task ValidateMergeRequest(GitlabIssue issue)
         {
-            return _gitlabClientRepository.ValidateMergeRequest(issue, currentProject);
+            return _gitlabClientRepository.ValidateMergeRequest(issue, issue.CurrentProject);
         }
 
         public async Task<GitlabProject> GetProject(string projectId)

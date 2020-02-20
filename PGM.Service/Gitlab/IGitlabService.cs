@@ -9,11 +9,11 @@ namespace PGM.Service.Gitlab
     {
         Task<List<GitlabIssue>> GetAllIssuesOfCurrentSprint(GitlabProject project);
 
-        Task SetAssigneeOnCurrentIssue(GitlabIssue issue, GitlabProject project);
+        Task SetAssigneeOnCurrentIssue(GitlabIssue issue);
 
-        Task CreateMergeRequest(GitlabIssue currentIssue, GitlabProject currentProject);
+        Task CreateMergeRequest(GitlabIssue issue);
 
-        Task ValidateMergeRequest(GitlabIssue issue, GitlabProject currentProject);
+        Task ValidateMergeRequest(GitlabIssue issue);
 
         Task<bool> ProjectExist(string projectId);
 
@@ -21,12 +21,12 @@ namespace PGM.Service.Gitlab
 
         Task<bool> GroupExist(string groupId);
 
-        Task AssignCorrectLabelRelatedToCurrentIssue(GitlabIssue issue, GitlabProject project, StepType stepType);
+        Task AssignCorrectLabelRelatedToCurrentIssue(GitlabIssue issue, StepType stepType);
 
-        Task SetAssigneeOnMergeRequest(GitlabIssue issue, GitlabProject project);
+        Task SetAssigneeOnMergeRequest(GitlabIssue issue);
 
-        Task SetMilestoneOnMergeRequest(GitlabIssue issue, GitlabProject project);
+        Task SetMilestoneOnMergeRequest(GitlabIssue issue);
 
-        Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssue gitlabIssue, GitlabProject currentProject);
+        Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssue gitlabIssue);
     }
 }

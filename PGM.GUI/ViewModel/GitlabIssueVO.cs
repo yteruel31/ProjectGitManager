@@ -46,5 +46,7 @@ namespace PGM.GUI.ViewModel
         public string WebUrl { get; set; }
 
         public StepTypeVO StepType { get; set; }
+
+        public ProjectVO CurrentProject { get; set; }
     }
 }

@@ -21,5 +21,7 @@ namespace PGM.Model
         public bool IsClosed { get; set; }
 
         public string WebUrl { get; set; }
+
+        public GitlabProject CurrentProject { get; set; }
     }
 }

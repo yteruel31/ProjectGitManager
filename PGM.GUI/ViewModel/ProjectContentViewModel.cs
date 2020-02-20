@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using MahApps.Metro.Controls;
+using PGM.GUI.AutoMapper;
 using PGM.GUI.Utilities;
 using PGM.GUI.ViewModel.Orchestrators;
 using PGM.GUI.ViewModel.Services;
@@ -26,6 +29,7 @@ namespace PGM.GUI.ViewModel
         private ICommand _createMergeRequestOnGitlabCommand;
         private ProjectVO _currentProject;
         private ICommand _openLinkInBrowserCommand;
+        
 
         public ObservableCollection<GitlabIssueVO> GitlabIssues { get; set; } = new ObservableCollection<GitlabIssueVO>();
 
@@ -67,7 +71,7 @@ namespace PGM.GUI.ViewModel
             (_createMergeRequestOnGitlabCommand = CommandFactory.CreateAsync(CreateMergeRequest, CanCreateMergeRequest,
                 nameof(CreateMergeRequestOnGitlabCommand), this));
 
-        public ProjectContentViewModel(IProjectContentOrchestrator projectContentOrchestrator, IDialogCoordinatorService dialogCoordinatorService)
+        public ProjectContentViewModel(IProjectContentOrchestrator projectContentOrchestrator, IDialogCoordinatorService dialogCoordinatorService, IMapperVoToModel mapper) : base(mapper)
         {
             _projectContentOrchestrator = projectContentOrchestrator;
             _dialogCoordinatorService = dialogCoordinatorService;
@@ -87,13 +91,15 @@ namespace PGM.GUI.ViewModel
 
         private async Task ValidateActualBranch()
         {
-            GitlabIssueVO selectedIssue = SelectedIssue;
-            bool haveConflits = await _projectContentOrchestrator.MergeRequestFromCurrentIssueHaveConflict(SelectedIssue, CurrentProject);
-            if (selectedIssue != null)
+            bool haveConflits = await CallMapperAndReturnAsync<GitlabIssue, bool>(SelectedIssue,
+                issue => _projectContentOrchestrator.MergeRequestFromCurrentIssueHaveConflict(issue));
+
+            if (SelectedIssue != null)
             {
                 if (!haveConflits)
                 {
-                    await _projectContentOrchestrator.ValidateActualBranch(selectedIssue, CurrentProject);
+                    await CallMapperAsync<GitlabIssue>(SelectedIssue,
+                        issue => _projectContentOrchestrator.ValidateActualBranch(issue));
                     LoadIssues(CurrentProject);
                 }
                 else
@@ -113,7 +119,8 @@ namespace PGM.GUI.ViewModel
         {
             if (SelectedIssue != null)
             {
-                await _projectContentOrchestrator.CreateMergeRequestActualBranch(SelectedIssue, CurrentProject);
+                await CallMapperAsync<GitlabIssue>(SelectedIssue,
+                    issue => _projectContentOrchestrator.CreateMergeRequestActualBranch(issue));
                 LoadIssues(CurrentProject);
             }
         }
@@ -127,7 +134,8 @@ namespace PGM.GUI.ViewModel
         {
             if (SelectedIssue != null)
             {
-                await _projectContentOrchestrator.CreateNewBranch(SelectedIssue, CurrentProject);
+                await CallMapperAsync<GitlabIssue>(SelectedIssue,
+                    issue => _projectContentOrchestrator.CreateNewBranch(issue));
                 LoadIssues(CurrentProject);
             }
         }
@@ -141,7 +149,9 @@ namespace PGM.GUI.ViewModel
         {
             if (SelectedIssue != null)
             {
-                await _projectContentOrchestrator.TestActualBranch(SelectedIssue, CurrentProject);
+                await CallMapperAsync<GitlabIssue>(SelectedIssue, issue => 
+                    _projectContentOrchestrator.TestActualBranch(issue));
+
                 LoadIssues(CurrentProject);
             }
         }
@@ -185,35 +195,45 @@ namespace PGM.GUI.ViewModel
 
         private async void LoadIssues(ProjectVO currentProjectVo, bool refresh = false)
         {
-            if (currentProjectVo != null)
+            if (currentProjectVo == null)
             {
-                _projectContentOrchestrator.SetupRepositoryOnCurrentProject(currentProjectVo);
-                List<GitlabIssueVO> gitlabIssueVos = await _projectContentOrchestrator.GetGitlabIssue(currentProjectVo);
-                gitlabIssueVos = gitlabIssueVos.OrderBy(i => (int) i.StepType).ToList();
-
-                Application.Current.Dispatcher?.Invoke(() =>
-                {
-                    bool previousIsRefreshing = IsRefreshing;
-                    IsRefreshing = true;
-                    if (!refresh)
-                    {
-                        GitlabIssues.Clear();
-                    }
-
-                    foreach (GitlabIssueVO gitlabIssueVo in gitlabIssueVos)
-                    {
-                        GitlabIssues.Add(gitlabIssueVo);
-                    }
-
-                    IsRefreshing = previousIsRefreshing;
-
-                    if (refresh)
-                    {
-                        GroupedIssues.Refresh();
-                        GroupedIssues.GroupDescriptions.Clear();
-                    }
-                });
+                return;
             }
+
+            CallMapper<GitlabProject>(currentProjectVo, project => _projectContentOrchestrator.SetupRepositoryOnCurrentProject(project));
+                
+            List<GitlabIssue> issues = await CallMapperAndReturnAsync<GitlabProject, List<GitlabIssue>>(currentProjectVo,
+                project => _projectContentOrchestrator.GetGitlabIssues(project));
+
+            List<GitlabIssueVO> gitlabIssueVos = issues.Select(gitlabIssue => 
+                    Mapper.Mapper.Map<GitlabIssueVO>(gitlabIssue))
+                .ToList();
+
+            gitlabIssueVos = gitlabIssueVos.OrderBy(i => (int) i.StepType).ToList();
+
+            Application.Current.Dispatcher?.Invoke(() =>
+            {
+                bool previousIsRefreshing = IsRefreshing;
+                IsRefreshing = true;
+                if (!refresh)
+                {
+                    GitlabIssues.Clear();
+                }
+
+                foreach (GitlabIssueVO gitlabIssueVo in gitlabIssueVos)
+                {
+                    gitlabIssueVo.CurrentProject = currentProjectVo;
+                    GitlabIssues.Add(gitlabIssueVo);
+                }
+
+                IsRefreshing = previousIsRefreshing;
+
+                if (refresh)
+                {
+                    GroupedIssues.Refresh();
+                    GroupedIssues.GroupDescriptions.Clear();
+                }
+            });
         }
     }
 }

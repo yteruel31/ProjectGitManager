@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using PGM.GUI.AutoMapper;
 using PGM.Model;
 using PGM.Service.Git;
 using PGM.Service.Gitlab;
@@ -12,76 +10,57 @@ namespace PGM.GUI.ViewModel.Orchestrators
     {
         private readonly IGitlabService _gitlabService;
         private readonly IGitService _gitService;
-        private readonly IMapperVoToModel _mapperVoToModel;
 
         public ProjectContentOrchestrator(
             IGitlabService gitlabService, 
-            IGitService gitService, 
-            IMapperVoToModel mapperVoToModel)
+            IGitService gitService)
         {
             _gitlabService = gitlabService;
             _gitService = gitService;
-            _mapperVoToModel = mapperVoToModel;
         }
 
-        public void SetupRepositoryOnCurrentProject(ProjectVO projectVo)
+        public void SetupRepositoryOnCurrentProject(GitlabProject currentProject)
         {
-            GitlabProject currentProject = _mapperVoToModel.Mapper.Map<GitlabProject>(projectVo);
             _gitService.SetupRepositoryOnCurrentProject(currentProject);
         }
 
-        public async Task ValidateActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)
+        public async Task ValidateActualBranch(GitlabIssue issue)
         {
-            GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
-            GitlabProject currentProject = _mapperVoToModel.Mapper.Map<GitlabProject>(currentProjectVo);
             _gitService.RebaseActualBranchOntoMaster(issue);
-            await _gitlabService.ValidateMergeRequest(issue, currentProject);
+            await _gitlabService.ValidateMergeRequest(issue);
             _gitService.DeleteActualBranch(issue);
         }
 
-        public async Task CreateMergeRequestActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)
+        public async Task CreateMergeRequestActualBranch(GitlabIssue issue)
         {
-            GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
-            GitlabProject currentProject = _mapperVoToModel.Mapper.Map<GitlabProject>(currentProjectVo);
             _gitService.CheckoutOnBranch(true);
-            await _gitlabService.CreateMergeRequest(issue, currentProject);
-            await _gitlabService.SetMilestoneOnMergeRequest(issue, currentProject);
-            await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, currentProject, StepType.ToValidate);
+            await _gitlabService.CreateMergeRequest(issue);
+            await _gitlabService.SetMilestoneOnMergeRequest(issue);
+            await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, StepType.ToValidate);
         }
 
-        public async Task CreateNewBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)
+        public async Task CreateNewBranch(GitlabIssue issue)
         {
-            GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
-            GitlabProject currentProject = _mapperVoToModel.Mapper.Map<GitlabProject>(currentProjectVo);
             _gitService.CreateBranchLinkedWithIssue(issue);
-            await _gitlabService.SetAssigneeOnCurrentIssue(issue, currentProject);
-            await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, currentProject, StepType.InProgress);
+            await _gitlabService.SetAssigneeOnCurrentIssue(issue);
+            await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, StepType.InProgress);
         }
 
-        public async Task<List<GitlabIssueVO>> GetGitlabIssue(ProjectVO projectVo)
+        public async Task<List<GitlabIssue>> GetGitlabIssues(GitlabProject project)
         {
-            GitlabProject project = _mapperVoToModel.Mapper.Map<GitlabProject>(projectVo);
-            List<GitlabIssue> gitlabIssues = await _gitlabService.GetAllIssuesOfCurrentSprint(project);
-            return gitlabIssues
-                .Select(gitlabIssue => _mapperVoToModel.Mapper.Map<GitlabIssueVO>(gitlabIssue))
-                .ToList();
+            return await _gitlabService.GetAllIssuesOfCurrentSprint(project);
         }
 
-        public async Task TestActualBranch(GitlabIssueVO issueVo, ProjectVO projectVo)
+        public async Task TestActualBranch(GitlabIssue issue)
         {
-            GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
-            GitlabProject project = _mapperVoToModel.Mapper.Map<GitlabProject>(projectVo);
             _gitService.CheckoutOnBranch(false, issue);
-            await _gitlabService.SetAssigneeOnMergeRequest(issue, project);
-            await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, project, StepType.Validating);
+            await _gitlabService.SetAssigneeOnMergeRequest(issue);
+            await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, StepType.Validating);
         }
 
-        public Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssueVO issueVo, ProjectVO projectVo)
+        public Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssue issue)
         {
-            GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
-            GitlabProject project = _mapperVoToModel.Mapper.Map<GitlabProject>(projectVo);
-
-            return _gitlabService.MergeRequestFromCurrentIssueHaveConflict(issue, project);
+            return _gitlabService.MergeRequestFromCurrentIssueHaveConflict(issue);
         }
      }
 }

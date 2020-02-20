@@ -1,22 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using PGM.Model;
 
 namespace PGM.GUI.ViewModel.Orchestrators
 {
     public interface IProjectContentOrchestrator
     {
-        Task CreateMergeRequestActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo);
+        Task CreateMergeRequestActualBranch(GitlabIssue issue);
 
-        Task ValidateActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo);
+        Task ValidateActualBranch(GitlabIssue issue);
 
-        Task CreateNewBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo);
+        Task CreateNewBranch(GitlabIssue issue);
 
-        Task<List<GitlabIssueVO>> GetGitlabIssue(ProjectVO project);
+        Task<List<GitlabIssue>> GetGitlabIssues(GitlabProject project);
 
-        Task TestActualBranch(GitlabIssueVO issueVo, ProjectVO projectVo);
+        Task TestActualBranch(GitlabIssue issue);
 
-        void SetupRepositoryOnCurrentProject(ProjectVO projectVo);
+        void SetupRepositoryOnCurrentProject(GitlabProject currentProject);
 
-        Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssueVO issueVo, ProjectVO projectVo);
+        Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssue issue);
     }
 }

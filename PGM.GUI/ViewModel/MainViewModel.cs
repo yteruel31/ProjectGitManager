@@ -23,7 +23,6 @@ namespace PGM.GUI.ViewModel
     public class MainViewModel : SubViewModelBase
     {
         private readonly IPgmService _pgmService;
-        private readonly IMapperVoToModel _mapperVoToModel;
         private readonly IMainOrchestrator _mainOrchestrator;
         private ICommand _activatedCommand;
         private readonly IDialogCoordinatorService _dialogCoordinatorService;
@@ -63,11 +62,10 @@ namespace PGM.GUI.ViewModel
             (_initializeSetupSettingsCommand = CommandFactory.CreateAsync(InitializeSetupSettings,
                 CanInitializeSetupSettings, nameof(InitializeSetupSettingsCommand), this));
 
-        public MainViewModel(IMapperVoToModel mapperVoToModel, 
+        public MainViewModel(IMapperVoToModel mapper, 
             IPgmService pgmService, 
-            IMainOrchestrator mainOrchestrator, IDialogCoordinatorService dialogCoordinatorService)
+            IMainOrchestrator mainOrchestrator, IDialogCoordinatorService dialogCoordinatorService): base(mapper)
         {
-            _mapperVoToModel = mapperVoToModel;
            _pgmService = pgmService;
            _mainOrchestrator = mainOrchestrator;
            _dialogCoordinatorService = dialogCoordinatorService;
@@ -111,8 +109,7 @@ namespace PGM.GUI.ViewModel
             }
 
             PgmSettingVo.Projects.Add(ProjectVo);
-            PGMSetting setting = _mapperVoToModel.Mapper.Map<PGMSetting>(PgmSettingVo);
-            _pgmService.WriteOnPgmSettings(setting);
+            CallMapper<PGMSetting>(PgmSettingVo, pgmSetting => _pgmService.WriteOnPgmSettings(pgmSetting));
             await CloseAddProjectDialog();
         }
 
@@ -124,8 +121,7 @@ namespace PGM.GUI.ViewModel
         private void DeleteCurrentProject(ProjectVO projectVo)
         {
             PgmSettingVo.Projects.Remove(projectVo);
-            PGMSetting setting = _mapperVoToModel.Mapper.Map<PGMSetting>(PgmSettingVo);
-            _pgmService.WriteOnPgmSettings(setting);
+            CallMapper<PGMSetting>(PgmSettingVo, pgmSetting => _pgmService.WriteOnPgmSettings(pgmSetting));
         }
 
         private bool CanCloseAddProjectDialog()
@@ -146,8 +142,7 @@ namespace PGM.GUI.ViewModel
 
         private async Task InitializeSetupSettings()
         {
-            PGMSetting pgmSetting = _mapperVoToModel.Mapper.Map<PGMSetting>(PgmSettingVo);
-            _pgmService.WriteOnPgmSettings(pgmSetting);
+            CallMapper<PGMSetting>(PgmSettingVo, setting => _pgmService.WriteOnPgmSettings(setting));
             await _dialogCoordinatorService.CloseDialog(_setupSettingsDialog);
         }
 
@@ -211,7 +206,8 @@ namespace PGM.GUI.ViewModel
             if (PgmSettingVo == null && ProjectVo == null)
             {
                 PGMSetting setting = _pgmService.InitializePgm();
-                PgmSettingVo = _mapperVoToModel.Mapper.Map<PGMSettingVO>(setting);
+                
+                PgmSettingVo = Mapper.Mapper.Map<PGMSettingVO>(setting);
                 ProjectVo = new ProjectVO();
 
                 if (!setting.PgmHasSetup && _setupSettingsDialog == null)

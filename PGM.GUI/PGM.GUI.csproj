@@ -248,6 +248,7 @@
     <Compile Include="ViewModel\IsProcessingMessage.cs" />
     <Compile Include="ViewModel\ISubViewModelBase.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\Orchestrators\IMainOrchestrator.cs" />
     <Compile Include="ViewModel\Orchestrators\IProjectContentOrchestrator.cs" />
     <Compile Include="ViewModel\Orchestrators\MainOrchestrator.cs" />
     <Compile Include="ViewModel\Orchestrators\ProjectContentOrchestrator.cs" />
