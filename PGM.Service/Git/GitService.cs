@@ -1,4 +1,4 @@
-﻿using LibGit2Sharp;
+using LibGit2Sharp;
 using PGM.Model;
 
 namespace PGM.Service.Git
@@ -21,7 +21,12 @@ namespace PGM.Service.Git
         {
             _gitRepository.CheckoutMaster();
             _gitRepository.PullOnRepository();
-            _gitRepository.CheckoutIssueBranch(issue.Id.ToString());
+            GitResult<Branch> result = _gitRepository.CheckoutIssueBranch(issue.Id.ToString());
+            
+            if (result.HasSucceeded)
+            {
+                _gitRepository.PushOnOriginBranch(result.Response, false);
+            }
         }
 
         public void RebaseActualBranchOntoMaster(GitlabIssue issue)
@@ -47,7 +52,17 @@ namespace PGM.Service.Git
                     return;
                 }
 
-                _gitRepository.CheckoutIssueBranch(issue.Id.ToString());
+                GitResult<Branch> result = _gitRepository.CheckoutIssueBranch(issue.Id.ToString());
+
+                if (!result.HasSucceeded)
+                {
+                    return;
+                }
+
+                if (result.Response.TrackingDetails.AheadBy > 0)
+                {
+                    _gitRepository.PullOnRepository();
+                }
             }
         }
     }

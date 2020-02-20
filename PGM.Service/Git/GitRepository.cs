@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -64,16 +65,16 @@ namespace PGM.Service.Git
         {
             try
             {
-                if (_repository.Branches.All(b => b.FriendlyName != $"issue/{issueId}"))
+                if (!IssueBranchExist(issueId))
                 {
-                    _repository.CreateBranch($"issue/{issueId}");
+                    Branch createdBranch = CreateNewIssueBranch(issueId);
+                    Commands.Checkout(_repository, createdBranch);
+
+                    return new GitResult<Branch>(true, createdBranch);
                 }
 
-                Branch branch = _repository.Branches[$"issue/{issueId}"];
-                _repository.Branches.Update(branch,
-                    b => b.Remote = OriginRemote.Name, b => b.UpstreamBranch = branch.CanonicalName);
+                Branch branch = GetIssueBranch(issueId, true);
                 Branch resultBranch = Commands.Checkout(_repository, branch);
-                PushOnOriginBranch(branch);
 
                 return new GitResult<Branch>(true, resultBranch);
             }
@@ -81,6 +82,31 @@ namespace PGM.Service.Git
             {
                 return new GitResult<Branch>(false, e);
             }
+        }
+
+        private Branch CreateNewIssueBranch(string issueId)
+        {
+            Branch createdBranch = _repository.CreateBranch($"issue/{issueId}");
+            _repository.Branches.Update(createdBranch,
+                b => b.Remote = OriginRemote.Name, b => b.UpstreamBranch = createdBranch.CanonicalName);
+
+            return createdBranch;
+        }
+
+        private Branch GetIssueBranch(string issueId, bool isOnRemote)
+        {
+            if (!isOnRemote)
+            {
+                return _repository.Branches[$"issue/{issueId}"];
+            }
+
+            List<Branch> remoteBranches = _repository.Branches.Where(b => b.IsRemote).ToList();
+            return remoteBranches.Single(rb => rb.FriendlyName.EndsWith($"issue/{issueId}"));
+        }
+
+        private bool IssueBranchExist(string issueId)
+        {
+            return _repository.Branches.Any(b => b.FriendlyName.Contains($"issue/{issueId}"));
         }
 
         public GitResult<Branch> GetActualBranch(string issueId)
