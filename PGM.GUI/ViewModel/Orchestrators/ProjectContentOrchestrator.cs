@@ -30,12 +30,13 @@ namespace PGM.GUI.ViewModel.Orchestrators
             _gitService.SetupRepositoryOnCurrentProject(currentProject);
         }
 
-        public Task ValidateActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)
+        public async Task ValidateActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)
         {
             GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
             GitlabProject currentProject = _mapperVoToModel.Mapper.Map<GitlabProject>(currentProjectVo);
             _gitService.RebaseActualBranchOntoMaster(issue);
-            return _gitlabService.ValidateMergeRequest(issue, currentProject);
+            await _gitlabService.ValidateMergeRequest(issue, currentProject);
+            _gitService.DeleteActualBranch(issue);
         }
 
         public async Task CreateMergeRequestActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)

@@ -1,4 +1,4 @@
-using LibGit2Sharp;
+﻿using LibGit2Sharp;
 using PGM.Model;
 
 namespace PGM.Service.Git
@@ -36,6 +36,12 @@ namespace PGM.Service.Git
             CheckoutOnBranch(false, issue);
             _gitRepository.RebaseOntoMaster(branch);
             _gitRepository.PushOnOriginBranch(branch, true);
+        }
+
+        public void DeleteActualBranch(GitlabIssue issue)
+        {
+            Branch branch = _gitRepository.GetActualBranch(issue.Id.ToString()).Response;
+            _gitRepository.DeleteLocalBranch(branch);
         }
 
         public void CheckoutOnBranch(bool isMasterBranch, GitlabIssue issue = null)

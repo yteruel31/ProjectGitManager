@@ -11,5 +11,7 @@ namespace PGM.Service.Git
         void SetupRepositoryOnCurrentProject(GitlabProject currentProject);
 
         void RebaseActualBranchOntoMaster(GitlabIssue issue);
+
+        void DeleteActualBranch(GitlabIssue issue);
     }
 }
