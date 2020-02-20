@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,8 +33,16 @@ namespace PGM.Service.Gitlab
         public async Task PostMergeRequest(string branch, string mrTitle, GitlabIssue issue,
             GitlabProject currentProject)
         {
-            Issue currentIssue = await GetIssue(currentProject, issue);
-            await _client.MergeRequests.CreateAsync(currentProject.Id, GetMergeRequestInfo(branch, mrTitle, currentIssue));
+            CreateMergeRequest request = GetMergeRequestInfo(branch, mrTitle, issue.Id.ToString());
+            
+            try
+            {
+                await _client.MergeRequests.CreateAsync(currentProject.Id, request);
+            }
+            catch (JsonSerializationException e)
+            {
+                Logger.Error(e);
+            }
         }
 
         public async Task ValidateMergeRequest(GitlabIssue issue, GitlabProject currentProject)
@@ -81,10 +89,14 @@ namespace PGM.Service.Gitlab
             return await Task.FromResult(new Milestone());
         }
 
-        private CreateMergeRequest GetMergeRequestInfo(string sourceBranch, string mrTitle, Issue issue)
+        private static CreateMergeRequest GetMergeRequestInfo(string sourceBranch, string mrTitle, string issueId)
         {
-            CreateMergeRequest createdMergeRequest = new CreateMergeRequest(sourceBranch, "master", mrTitle);
-            createdMergeRequest.Description = $"Closes #{issue.Iid}";
+            CreateMergeRequest createdMergeRequest = new CreateMergeRequest(sourceBranch, "master", mrTitle)
+            {
+                Description = $"Closes #{issueId}",
+                RemoveSourceBranch = true
+            };
+
             return createdMergeRequest;
         }
 
