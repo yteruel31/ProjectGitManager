@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GitLabApiClient;
@@ -37,12 +38,16 @@ namespace PGM.Service.Gitlab
             GitlabProject currentProject)
         {
             CreateMergeRequest request = GetMergeRequestInfo(branch, mrTitle, issue.Id.ToString());
-            
+
             try
             {
                 await _client.MergeRequests.CreateAsync(currentProject.Id, request);
             }
             catch (JsonSerializationException e)
+            {
+                Logger.Error(e);
+            }
+            catch (AggregateException e)
             {
                 Logger.Error(e);
             }
