@@ -25,6 +25,8 @@ namespace PGM.Service.Gitlab
 
         Task SetAssigneeOnMergeRequest(GitlabIssue issue, GitlabProject project);
 
+        Task SetMilestoneOnMergeRequest(GitlabIssue issue, GitlabProject project);
+
         Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssue gitlabIssue, GitlabProject currentProject);
     }
 }

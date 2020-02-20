@@ -41,7 +41,7 @@ namespace PGM.Service.Gitlab
                 {
                     GitlabIssue gitlabIssue = GetGitlabIssue(issue, project);
                     SetStepType(gitlabIssue);
-                    if (gitlabIssue.GitlabMilestone.Id != issue.Milestone.Id)
+                    if (gitlabIssue.Milestone.Id != issue.Milestone.Id)
                     {
                         continue;
                     }
@@ -53,7 +53,7 @@ namespace PGM.Service.Gitlab
             return gitlabIssues;
         }
 
-        private void SetStepType(GitlabIssue gitlabIssue)
+        private static void SetStepType(GitlabIssue gitlabIssue)
         {
             if (gitlabIssue.IsClosed)
             {
@@ -102,7 +102,7 @@ namespace PGM.Service.Gitlab
                 Title = issue.Title,
                 Description = issue.Description,
                 IsClosed = issue.State == IssueState.Closed,
-                GitlabMilestone = new GitlabMilestone()
+                Milestone = new GitlabMilestone()
                 {
                     Id = issue.Milestone.Id,
                     Title = issue.Milestone.Title
@@ -114,7 +114,7 @@ namespace PGM.Service.Gitlab
             };
         }
 
-        private GitlabProject GetGitlabProject(Project project)
+        private static GitlabProject GetGitlabProject(Project project)
         {
             return new GitlabProject
             {
@@ -123,7 +123,7 @@ namespace PGM.Service.Gitlab
             };
         }
 
-        private List<GitlabAssignee> GetGitlabAssignees(List<Assignee> assignees)
+        private static List<GitlabAssignee> GetGitlabAssignees(List<Assignee> assignees)
         {
             return assignees.Select(assignee => new GitlabAssignee
                 {
@@ -167,6 +167,11 @@ namespace PGM.Service.Gitlab
         public Task SetAssigneeOnMergeRequest(GitlabIssue issue, GitlabProject project)
         {
             return _gitlabClientRepository.SetAssigneeOnMergeRequest(issue, project);
+        }
+
+        public Task SetMilestoneOnMergeRequest(GitlabIssue issue, GitlabProject project)
+        {
+            return _gitlabClientRepository.SetMilestoneOnMergeRequest(issue, project);
         }
 
         public Task ValidateMergeRequest(GitlabIssue issue, GitlabProject currentProject)

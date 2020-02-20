@@ -22,6 +22,8 @@ namespace PGM.GUI.AutoMapper
                 cfg.CreateMap<Credential, CredentialVO>();
                 cfg.CreateMap<GitlabAssigneeVO, GitlabAssignee>();
                 cfg.CreateMap<GitlabAssignee, GitlabAssigneeVO>();
+                cfg.CreateMap<GitlabMilestoneVO, GitlabMilestone>();
+                cfg.CreateMap<GitlabMilestone, GitlabMilestoneVO>();
             });
             Mapper = config.CreateMapper();
         }

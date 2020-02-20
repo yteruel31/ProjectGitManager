@@ -30,20 +30,21 @@ namespace PGM.GUI.ViewModel.Orchestrators
             _gitService.SetupRepositoryOnCurrentProject(currentProject);
         }
 
-        public async Task ValidateActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)
+        public Task ValidateActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)
         {
             GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
             GitlabProject currentProject = _mapperVoToModel.Mapper.Map<GitlabProject>(currentProjectVo);
             _gitService.RebaseActualBranchOntoMaster(issue);
-            await _gitlabService.ValidateMergeRequest(issue, currentProject);
+            return _gitlabService.ValidateMergeRequest(issue, currentProject);
         }
 
         public async Task CreateMergeRequestActualBranch(GitlabIssueVO issueVo, ProjectVO currentProjectVo)
         {
             GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
             GitlabProject currentProject = _mapperVoToModel.Mapper.Map<GitlabProject>(currentProjectVo);
-            await _gitlabService.CreateMergeRequest(issue, currentProject);
             _gitService.CheckoutOnBranch(true);
+            await _gitlabService.CreateMergeRequest(issue, currentProject);
+            await _gitlabService.SetMilestoneOnMergeRequest(issue, currentProject);
             await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, currentProject, StepType.ToValidate);
         }
 
@@ -51,8 +52,8 @@ namespace PGM.GUI.ViewModel.Orchestrators
         {
             GitlabIssue issue = _mapperVoToModel.Mapper.Map<GitlabIssue>(issueVo);
             GitlabProject currentProject = _mapperVoToModel.Mapper.Map<GitlabProject>(currentProjectVo);
-            await _gitlabService.SetAssigneeOnCurrentIssue(issue, currentProject);
             _gitService.CreateBranchLinkedWithIssue(issue);
+            await _gitlabService.SetAssigneeOnCurrentIssue(issue, currentProject);
             await _gitlabService.AssignCorrectLabelRelatedToCurrentIssue(issue, currentProject, StepType.InProgress);
         }
 

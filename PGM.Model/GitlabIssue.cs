@@ -10,7 +10,7 @@ namespace PGM.Model
 
         public string Description { get; set; }
 
-        public GitlabMilestone GitlabMilestone { get; set; }
+        public GitlabMilestone Milestone { get; set; }
         
         public List<string> Labels { get; set; }
 

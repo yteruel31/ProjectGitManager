@@ -41,6 +41,8 @@ namespace PGM.GUI.ViewModel
 
         public List<GitlabAssigneeVO> Assignees { get; set; }
 
+        public GitlabMilestoneVO Milestone { get; set; }
+
         public string WebUrl { get; set; }
 
         public StepTypeVO StepType { get; set; }

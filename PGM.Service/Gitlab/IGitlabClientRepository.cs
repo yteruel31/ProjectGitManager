@@ -30,11 +30,11 @@ namespace PGM.Service.Gitlab
 
         Task<Group> GetGroup(string groupId);
 
-        Task<Issue> GetIssue(GitlabProject project, GitlabIssue issue);
-
         Task SetLabelOnCurrentIssue(GitlabIssue issue, GitlabProject project, string labelNameToAdd = null,
             string labelNameToRemove = null);
 
         Task SetAssigneeOnMergeRequest(GitlabIssue gitlabIssue, GitlabProject project);
+
+        Task SetMilestoneOnMergeRequest(GitlabIssue gitlabIssue, GitlabProject project);
     }
 }

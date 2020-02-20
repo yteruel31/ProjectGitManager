@@ -244,6 +244,7 @@
     <Compile Include="Utilities\CustomCommand.cs" />
     <Compile Include="ViewModel\GitlabAssigneeVO.cs" />
     <Compile Include="ViewModel\GitlabIssueVO.cs" />
+    <Compile Include="ViewModel\GitlabMilestoneVO.cs" />
     <Compile Include="ViewModel\IsProcessingMessage.cs" />
     <Compile Include="ViewModel\ISubViewModelBase.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
