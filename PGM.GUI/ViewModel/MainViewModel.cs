@@ -36,6 +36,7 @@ namespace PGM.GUI.ViewModel
         private CustomDialog _addProjectDialog;
         private ICommand _closeAddProjectDialogCommand;
         private bool _groupFieldIsVisible;
+        private ICommand _deleteCurrentProjectCommand;
 
         public ICommand ShowAddProjectDialogCommand =>
             _showAddProjectDialogCommand ??
@@ -51,6 +52,11 @@ namespace PGM.GUI.ViewModel
             _addProjectCommand ??
             (_addProjectCommand =
                 CommandFactory.CreateAsync(AddProject, CanAddProject, nameof(AddProjectCommand), this));
+
+        public ICommand DeleteCurrentProjectCommand =>
+            _deleteCurrentProjectCommand ??
+            (_deleteCurrentProjectCommand =
+                CommandFactory.Create<ProjectVO>(DeleteCurrentProject, CanDeleteCurrentProject, nameof(DeleteCurrentProjectCommand)));
 
         public ICommand InitializeSetupSettingsCommand =>
             _initializeSetupSettingsCommand ??
@@ -108,6 +114,18 @@ namespace PGM.GUI.ViewModel
             PGMSetting setting = _mapperVoToModel.Mapper.Map<PGMSetting>(PgmSettingVo);
             _pgmService.WriteOnPgmSettings(setting);
             await CloseAddProjectDialog();
+        }
+
+        private bool CanDeleteCurrentProject(ProjectVO projectVo)
+        {
+            return true;
+        }
+
+        private void DeleteCurrentProject(ProjectVO projectVo)
+        {
+            PgmSettingVo.Projects.Remove(projectVo);
+            PGMSetting setting = _mapperVoToModel.Mapper.Map<PGMSetting>(PgmSettingVo);
+            _pgmService.WriteOnPgmSettings(setting);
         }
 
         private bool CanCloseAddProjectDialog()

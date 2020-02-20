@@ -77,21 +77,24 @@
             <Button Grid.Row="0" 
                     Content="Add new project" Width="Auto" HorizontalAlignment="Left" Margin="10"
                     Command="{Binding ShowAddProjectDialogCommand}"/>
-            <TabControl Grid.Row="1" 
+            <mah:MetroTabControl Grid.Row="1" 
                         ItemsSource="{Binding PgmSettingVo.Projects}"
-                        mah:TabControlHelper.Underlined="TabPanel" 
-                        mah:ControlsHelper.HeaderFontSize="10">
-                <TabControl.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}"/>
-                    </DataTemplate>
-                </TabControl.ItemTemplate>
-                <TabControl.ContentTemplate>
+                        mah:TabControlHelper.Underlined="TabPanel">
+                <mah:MetroTabControl.ItemContainerStyle>
+                    <Style TargetType="{x:Type mah:MetroTabItem}">
+                        <Setter Property="Header" Value="{Binding Name}"/>
+                        <Setter Property="CloseButtonEnabled" Value="True" />
+                        <Setter Property="CloseTabCommand"
+                                Value="{Binding Path=DataContext.DeleteCurrentProjectCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type mah:MetroTabControl}}}" />
+                        <Setter Property="CloseTabCommandParameter" Value="{Binding .}" />
+                    </Style>
+                </mah:MetroTabControl.ItemContainerStyle>
+                <mah:MetroTabControl.ContentTemplate>
                     <DataTemplate>
                         <view:ProjectContentControl DataContext="{Binding Context}"/>
                     </DataTemplate>
-                </TabControl.ContentTemplate>
-            </TabControl>
+                </mah:MetroTabControl.ContentTemplate>
+            </mah:MetroTabControl>
         </Grid>
         <StatusBar Grid.Row="1" >
             <StatusBarItem Content="PGM" />
