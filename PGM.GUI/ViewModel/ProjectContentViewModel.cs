@@ -10,6 +10,8 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using MahApps.Metro.Controls;
+using Markdig;
+using Markdig.Wpf;
 using PGM.GUI.AutoMapper;
 using PGM.GUI.Utilities;
 using PGM.GUI.ViewModel.Orchestrators;
@@ -50,6 +52,8 @@ namespace PGM.GUI.ViewModel
                 }
             }
         }
+
+        public MarkdownPipeline MarkdownPipeline => new MarkdownPipelineBuilder().UseSupportedExtensions().Build();
 
         public ICommand OpenLinkInBrowserCommand =>
             _openLinkInBrowserCommand ??

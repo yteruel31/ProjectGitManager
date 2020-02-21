@@ -4,9 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:Model="clr-namespace:PGM.Model;assembly=PGM.Model"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              DataContext="{Binding Source={StaticResource Locator}, Path=MainPgm.ProjectVo.Context.SelectedIssue}">
+    <FrameworkElement.CommandBindings>
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
+    </FrameworkElement.CommandBindings>
     <Grid>
         <ScrollViewer
             d:DataContext="{d:DesignInstance Model:GitlabIssue}">
@@ -32,7 +36,7 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </StackPanel>
-                    <TextBlock Text="{Binding Description}" />
+                    <markdig:MarkdownViewer Markdown="{Binding Description}" Pipeline="{Binding Source={StaticResource Locator}, Path=MainPgm.ProjectVo.Context.MarkdownPipeline}"/>
                 </StackPanel>
             </Border>
         </ScrollViewer>
