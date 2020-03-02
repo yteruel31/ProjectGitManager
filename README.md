@@ -4,4 +4,4 @@
 
 ## Documentation
 
-See the documentation in the [Wiki](https://gitlab.com/yteruel31/projectgitmanager/-/wikis/home)
+See the documentation in the [Wiki](https://github.com/yteruel31/ProjectGitManager/wiki)
