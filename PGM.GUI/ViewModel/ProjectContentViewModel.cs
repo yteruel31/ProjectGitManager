@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -41,7 +39,6 @@ namespace PGM.GUI.ViewModel
         {
             get
             {
-                LoadIssues(_currentProject, IsRefreshing);
                 return _currentProject;
             }
             set
@@ -49,6 +46,7 @@ namespace PGM.GUI.ViewModel
                 if (_currentProject != value)
                 {
                     Set(nameof(CurrentProject), ref _currentProject, value);
+                    LoadIssues(_currentProject, IsRefreshing);
                 }
             }
         }

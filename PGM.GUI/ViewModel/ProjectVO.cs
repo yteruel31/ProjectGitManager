@@ -9,6 +9,7 @@ namespace PGM.GUI.ViewModel
         private string _name;
         private string _groupId;
         private string _groupName;
+        private string _repositoryPath;
 
         public string Id
         {
@@ -34,7 +35,17 @@ namespace PGM.GUI.ViewModel
             }
         }
 
-        public string RepositoryPath { get; set; }
+        public string RepositoryPath
+        {
+            get { return _repositoryPath; }
+            set
+            {
+                if (_repositoryPath != value)
+                {
+                    Set(nameof(RepositoryPath), ref _repositoryPath, value);
+                }
+            }
+        }
 
         public string GroupId
         {

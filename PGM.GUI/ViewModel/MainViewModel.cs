@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,7 +15,6 @@ using PGM.GUI.ViewModel.Orchestrators;
 using PGM.GUI.ViewModel.Services;
 using PGM.Model;
 using PGM.Service;
-using Squirrel;
 
 // ReSharper disable ConvertToNullCoalescingCompoundAssignment
 
@@ -31,7 +29,7 @@ namespace PGM.GUI.ViewModel
         private PGMSettingVO _pgmSettingVo;
         private ICommand _showAddProjectDialogCommand;
         private ICommand _addProjectCommand;
-        private ProjectVO _projectVo;
+        private ProjectVO _selectedProject;
         private CustomDialog _setupSettingsDialog;
         private CustomDialog _addProjectDialog;
         private ICommand _closeAddProjectDialogCommand;
@@ -82,28 +80,25 @@ namespace PGM.GUI.ViewModel
 
         private bool CanAddProject()
         {
-            if (GroupFieldIsVisible)
+            if (SelectedProject == null)
             {
-                return _mainOrchestrator.CheckIfGitlabProjectExist(ProjectVo.Id ?? "").Result
-                       && _mainOrchestrator.CheckIfGitlabGroupExist(ProjectVo.GroupId ?? "").Result
-                       && _mainOrchestrator.CheckIfGitDirectoryPathExist(ProjectVo.RepositoryPath);
+                return false;
             }
 
-            return _mainOrchestrator.CheckIfGitlabProjectExist(ProjectVo.Id ?? "").Result
-                   && _mainOrchestrator.CheckIfGitDirectoryPathExist(ProjectVo.RepositoryPath);
+            if (SelectedProject.Id != null)
+            {
+                return _mainOrchestrator.CheckIfGitlabProjectExist(SelectedProject.Id ?? "").Result
+                       && _mainOrchestrator.CheckIfGitlabGroupExist(SelectedProject.GroupId ?? "").Result
+                       && _mainOrchestrator.CheckIfGitDirectoryPathExist(SelectedProject.RepositoryPath);
+            }
+
+            return _mainOrchestrator.CheckIfGitlabProjectExist(SelectedProject.Id ?? "").Result
+                   && _mainOrchestrator.CheckIfGitDirectoryPathExist(SelectedProject.RepositoryPath);
         }
 
         private async Task AddProject()
         {
-            GitlabProject gitlabProject = await _mainOrchestrator.GetGitlabProject(ProjectVo.Id);
-            ProjectVo.Name = gitlabProject.Name;
-            
-            if (!GroupFieldIsVisible)
-            {
-                ProjectVo.GroupId = string.Empty;
-            }
-
-            PgmSettingVo.Projects.Add(ProjectVo);
+            PgmSettingVo.Projects.Add(SelectedProject);
             CallMapper<PGMSetting>(PgmSettingVo, pgmSetting => _pgmService.WriteOnPgmSettings(pgmSetting));
             await CloseAddProjectDialog();
         }
@@ -194,12 +189,12 @@ namespace PGM.GUI.ViewModel
 
         private async Task LaunchPgm()
         {
-            if (PgmSettingVo == null && ProjectVo == null)
+            if (PgmSettingVo == null && SelectedProject == null)
             {
                 PGMSetting setting = _pgmService.InitializePgm();
                 
                 PgmSettingVo = Mapper.Mapper.Map<PGMSettingVO>(setting);
-                ProjectVo = new ProjectVO();
+                SelectedProject = new ProjectVO();
 
                 if (!setting.PgmHasSetup && _setupSettingsDialog == null)
                 {

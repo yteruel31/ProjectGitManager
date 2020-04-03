@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GitLabApiClient;
 using GitLabApiClient.Models;
+using GitLabApiClient.Models.Groups.Responses;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.MergeRequests.Responses;
 using GitLabApiClient.Models.Projects.Responses;
@@ -28,7 +28,7 @@ namespace PGM.Service.Gitlab
             {
                 issueResult = await _gitlabClientRepository.GetIssuesFromCurrentProject(project);
             }
-            catch (GitLabException)
+            catch (Exception)
             {
                 return new List<GitlabIssue>();
             }
@@ -235,6 +235,19 @@ namespace PGM.Service.Gitlab
             AddProjectsFromCurrentUser(projectsFromCurrentUser, projects);
 
             return projects;
+        }
+
+        private static void AddProjectsFromCurrentUser(IList<Project> projectsFromCurrentUser, List<GitlabProject> projects)
+        {
+            foreach (Project project in projectsFromCurrentUser.Where(project => project.Namespace.Kind == "user"))
+            {
+                GitlabProject gitlabProject = new GitlabProject
+                {
+                    Id = project.Id.ToString(),
+                    Name = project.Name
+                };
+                projects.Add(gitlabProject);
+            }
         }
     }
 }
