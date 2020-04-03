@@ -5,56 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:I="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:view="clr-namespace:PGM.GUI.View"
-        xmlns:viewModel="clr-namespace:PGM.GUI.ViewModel"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         Icon="../Resources/PGM.ico"
         Title="ProjectGitManager" Height="450" Width="800"
         DataContext="{Binding Source={StaticResource Locator}, Path=MainPgm}">
     <Window.Resources>
-        <ResourceDictionary>
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            <UserControl x:Key="SetupSettingsDialog"
-                         MinHeight="200">
-                <StackPanel>
-                    <Label Content="Fill the following fields:" />
-                    <TextBlock Text="GitLab API Key"/>
-                    <TextBox Text="{Binding PgmSettingVo.GitLabApiKey}" />
-                    <TextBlock Text="Username Gitlab"/>
-                    <TextBox Text="{Binding PgmSettingVo.Credential.Username}" />
-                    <TextBlock Text="Password Gitlab"/>
-                    <TextBox Text="{Binding PgmSettingVo.Credential.Password}" />
-                    <TextBlock Text="Email"/>
-                    <TextBox Text="{Binding PgmSettingVo.Email}" />
-                    <TextBlock Text="Fullname"/>
-                    <TextBox Text="{Binding PgmSettingVo.FullName}" />
-
-                    <Button Content="OK" 
-                            Command="{Binding InitializeSetupSettingsCommand}"
-                            CommandParameter="{Binding ., RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type mah:CustomDialog}}}"/>
-                </StackPanel>
-            </UserControl>
-            <UserControl x:Key="AddProjectDialog">
-                <StackPanel>
-                    <Label Content="Fill the following fields:" />
-                    <TextBlock Text="ID of Gitlab Project"/>
-                    <TextBox Text="{Binding ProjectVo.Id}" />
-                    <TextBlock Text="Repository Path"/>
-                    <TextBox Text="{Binding ProjectVo.RepositoryPath}"/>
-                    <CheckBox Content="Project is in a Gitlab group?" IsChecked="{Binding GroupFieldIsVisible}"/>
-                    <TextBlock 
-                        Text="ID of Gitlab Group" 
-                        Visibility="{Binding GroupFieldIsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    <TextBox 
-                        Text="{Binding ProjectVo.GroupId}"
-                        Visibility="{Binding GroupFieldIsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Add" Command="{Binding AddProjectCommand}"/>
-                        <Button Content="Cancel" Command="{Binding CloseAddProjectDialogCommand}"/>
-                    </StackPanel>
-                </StackPanel>
-            </UserControl>
-        </ResourceDictionary>
+        <ResourceDictionary Source="Styles/Controls.xaml"/>
     </Window.Resources>
     <I:Interaction.Triggers>
         <I:EventTrigger EventName="Loaded">

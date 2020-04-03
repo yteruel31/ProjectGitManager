@@ -1,0 +1,10 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Controls.FolderEntry.xaml"/>
+        <ResourceDictionary Source="ComboBox.xaml"/>
+
+        <ResourceDictionary Source="Dialogs/UserControls.AddProject.xaml"/>
+        <ResourceDictionary Source="Dialogs/UserControls.SetupSettings.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
