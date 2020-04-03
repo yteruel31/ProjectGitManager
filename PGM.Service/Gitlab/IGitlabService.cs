@@ -28,5 +28,7 @@ namespace PGM.Service.Gitlab
         Task SetMilestoneOnMergeRequest(GitlabIssue issue);
 
         Task<bool> MergeRequestFromCurrentIssueHaveConflict(GitlabIssue gitlabIssue);
+
+        Task<IEnumerable<GitlabProject>> GetProjectsFromCurrentUser();
     }
 }

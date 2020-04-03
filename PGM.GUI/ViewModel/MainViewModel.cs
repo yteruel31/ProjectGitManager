@@ -1,10 +1,12 @@
 using System;
-using System.Diagnostics;
-using System.IO;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -27,14 +29,12 @@ namespace PGM.GUI.ViewModel
         private ICommand _activatedCommand;
         private readonly IDialogCoordinatorService _dialogCoordinatorService;
         private PGMSettingVO _pgmSettingVo;
-        private ICommand _initializeSetupSettingsCommand;
         private ICommand _showAddProjectDialogCommand;
         private ICommand _addProjectCommand;
         private ProjectVO _projectVo;
         private CustomDialog _setupSettingsDialog;
         private CustomDialog _addProjectDialog;
         private ICommand _closeAddProjectDialogCommand;
-        private bool _groupFieldIsVisible;
         private ICommand _deleteCurrentProjectCommand;
 
         public ICommand ShowAddProjectDialogCommand =>
@@ -56,11 +56,6 @@ namespace PGM.GUI.ViewModel
             _deleteCurrentProjectCommand ??
             (_deleteCurrentProjectCommand =
                 CommandFactory.Create<ProjectVO>(DeleteCurrentProject, CanDeleteCurrentProject, nameof(DeleteCurrentProjectCommand)));
-
-        public ICommand InitializeSetupSettingsCommand =>
-            _initializeSetupSettingsCommand ??
-            (_initializeSetupSettingsCommand = CommandFactory.CreateAsync(InitializeSetupSettings,
-                CanInitializeSetupSettings, nameof(InitializeSetupSettingsCommand), this));
 
         public MainViewModel(IMapperVoToModel mapper, 
             IPgmService pgmService, 
@@ -133,17 +128,7 @@ namespace PGM.GUI.ViewModel
         {
             await _dialogCoordinatorService.CloseDialog(_addProjectDialog);
             _addProjectDialog = null;
-        }
-
-        private bool CanInitializeSetupSettings()
-        {
-            return true;
-        }
-
-        private async Task InitializeSetupSettings()
-        {
-            CallMapper<PGMSetting>(PgmSettingVo, setting => _pgmService.WriteOnPgmSettings(setting));
-            await _dialogCoordinatorService.CloseDialog(_setupSettingsDialog);
+            SelectedProject = new ProjectVO();
         }
 
         public PGMSettingVO PgmSettingVo
@@ -168,30 +153,36 @@ namespace PGM.GUI.ViewModel
             }
         }
 
-        public ProjectVO ProjectVo
+        public ObservableCollection<ProjectVO> ProjectsVo { get; set; } = new ObservableCollection<ProjectVO>();
+
+        public ICollectionView ProjectsGrouped
         {
-            get { return _projectVo; }
+            get
+            {
+                ICollectionView view = CollectionViewSource.GetDefaultView(ProjectsVo);
+                PropertyGroupDescription propertyGroupDescription = new PropertyGroupDescription(nameof(ProjectVO.GroupName));
+                
+                if(!view.GroupDescriptions.Contains(propertyGroupDescription))
+                {
+                    view.GroupDescriptions.Add(propertyGroupDescription);
+                }
+                
+                return view;
+            }
+        }
+
+        public ProjectVO SelectedProject
+        {
+            get { return _selectedProject; }
             set
             {
-                if (_projectVo != value)
+                if (_selectedProject != value)
                 {
-                    Set(nameof(ProjectVo), ref _projectVo, value);
+                    Set(nameof(SelectedProject), ref _selectedProject, value);
                 }
             }
         }
 
-        public bool GroupFieldIsVisible
-        {
-            get { return _groupFieldIsVisible; }
-            set
-            {
-                if (_groupFieldIsVisible != value)
-                {
-                    Set(nameof(GroupFieldIsVisible), ref _groupFieldIsVisible, value);
-                }
-            }
-        }
- 
         public ICommand LaunchPgmCommand =>
             _activatedCommand ?? 
             (_activatedCommand = CommandFactory.CreateAsync(LaunchPgm, CanLaunchPgm, nameof(LaunchPgmCommand), this));
@@ -213,6 +204,12 @@ namespace PGM.GUI.ViewModel
                 if (!setting.PgmHasSetup && _setupSettingsDialog == null)
                 {
                     _setupSettingsDialog = await _dialogCoordinatorService.ShowConfigSettings("SetupSettingsDialog");
+                }
+                else
+                {
+                    IEnumerable<GitlabProject> projects = await _mainOrchestrator.GetGitlabProjectsFromCurrentUser();
+                    CallMapper<List<ProjectVO>>(projects, projectsVo =>
+                        projectsVo.ForEach(projectVo => ProjectsVo.Add(projectVo)));
                 }
             }
         }

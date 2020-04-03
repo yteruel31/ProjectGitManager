@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using PGM.Model;
 using PGM.Service;
 using PGM.Service.Gitlab;
@@ -37,6 +38,11 @@ namespace PGM.GUI.ViewModel.Orchestrators
         public Task<GitlabProject> GetGitlabProject(string projectId)
         {
             return _gitlabService.GetProject(projectId);
+        }
+
+        public Task<IEnumerable<GitlabProject>> GetGitlabProjectsFromCurrentUser()
+        {
+            return _gitlabService.GetProjectsFromCurrentUser();
         }
     }
 }

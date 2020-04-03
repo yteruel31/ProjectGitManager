@@ -6,6 +6,7 @@ using GitLabApiClient.Models.Groups.Responses;
 using GitLabApiClient.Models.Issues.Responses;
 using GitLabApiClient.Models.MergeRequests.Responses;
 using GitLabApiClient.Models.Projects.Responses;
+using GitLabApiClient.Models.Users.Responses;
 using PGM.Model;
 
 namespace PGM.Service.Gitlab
@@ -36,5 +37,13 @@ namespace PGM.Service.Gitlab
         Task SetAssigneeOnMergeRequest(GitlabIssue gitlabIssue, GitlabProject project);
 
         Task SetMilestoneOnMergeRequest(GitlabIssue gitlabIssue, GitlabProject project);
+
+        Task<IList<Group>> GetGroupsFromCurrentUser();
+
+        Task<IList<Project>> GetProjectsFromCurrentUser();
+
+        Task<Session> GetCurrentUser();
+
+        Task<IList<Project>> GetProjectsByGroupId(int groupId);
     }
 }

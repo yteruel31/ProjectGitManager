@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using GalaSoft.MvvmLight;
 
 namespace PGM.GUI.ViewModel
@@ -8,6 +8,7 @@ namespace PGM.GUI.ViewModel
         private string _id;
         private string _name;
         private string _groupId;
+        private string _groupName;
 
         public string Id
         {
@@ -43,6 +44,18 @@ namespace PGM.GUI.ViewModel
                 if (_groupId != value)
                 {
                     Set(nameof(GroupId), ref _groupId, value);
+                }
+            }
+        }
+
+        public string GroupName
+        {
+            get { return _groupName; }
+            set
+            {
+                if (_groupName != value)
+                {
+                    Set(nameof(GroupName), ref _groupName, value);
                 }
             }
         }

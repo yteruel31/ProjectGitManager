@@ -187,14 +187,39 @@ namespace PGM.Service.Gitlab
             return _client.Projects.GetAsync(projectId);
         }
 
+        public async Task<IList<Project>> GetProjectsFromCurrentUser()
+        {
+            return await _client.Projects.GetAsync(opt =>
+            {
+                opt.Owned = true;
+                opt.Archived = false;
+            });
+
+        }
+
+        public Task<IList<Project>> GetProjectsByGroupId(int groupId)
+        {
+            return _client.Groups.GetProjectsAsync(groupId);
+        }
+
         public Task<Group> GetGroup(string groupId)
         {
             return _client.Groups.GetAsync(groupId);
         }
 
+        public Task<IList<Group>> GetGroupsFromCurrentUser()
+        {
+            return _client.Groups.GetAsync(options => { options.MinAccessLevel = AccessLevel.Developer; });
+        }
+
+        public Task<Session> GetCurrentUser()
+        {
+            return _client.Users.GetCurrentSessionAsync();
+        }
+
         public async Task<Assignee> GetAssigneeFromCurrentUser()
         {
-            Session session = await _client.Users.GetCurrentSessionAsync();
+            Session session = await GetCurrentUser();
             Assignee assignee = new Assignee()
             {
                 Id = session.Id,

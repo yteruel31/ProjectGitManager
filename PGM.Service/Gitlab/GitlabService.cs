@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -207,6 +207,34 @@ namespace PGM.Service.Gitlab
             Task task = _gitlabClientRepository.GetProject(projectId);
 
             return Task.FromResult(!task.IsCanceled);
+        }
+
+        public async Task<IEnumerable<GitlabProject>> GetProjectsFromCurrentUser()
+        {
+            IList<Group> groupsFromCurrentUser = await _gitlabClientRepository.GetGroupsFromCurrentUser();
+            IList<Project> projectsFromCurrentUser = await _gitlabClientRepository.GetProjectsFromCurrentUser();
+            List<GitlabProject> projects = new List<GitlabProject>();
+            
+            foreach (Group group in groupsFromCurrentUser)
+            {
+                IList<Project> projectsByGroup = await _gitlabClientRepository.GetProjectsByGroupId(group.Id);
+
+                foreach (Project groupProject in projectsByGroup)
+                {
+                    GitlabProject project =  new GitlabProject
+                    {
+                        GroupId = group.Id.ToString(),
+                        GroupName = group.Name,
+                        Id = groupProject.Id.ToString(),
+                        Name = groupProject.Name
+                    };
+                    projects.Add(project);
+                }
+            }
+
+            AddProjectsFromCurrentUser(projectsFromCurrentUser, projects);
+
+            return projects;
         }
     }
 }

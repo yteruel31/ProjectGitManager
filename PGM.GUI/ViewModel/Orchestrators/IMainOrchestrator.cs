@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using PGM.Model;
 
 namespace PGM.GUI.ViewModel.Orchestrators
@@ -12,5 +13,7 @@ namespace PGM.GUI.ViewModel.Orchestrators
         bool CheckIfGitDirectoryPathExist(string directoryPath);
 
         Task<bool> CheckIfGitlabGroupExist(string groupId);
+
+        Task<IEnumerable<GitlabProject>> GetGitlabProjectsFromCurrentUser();
     }
 }

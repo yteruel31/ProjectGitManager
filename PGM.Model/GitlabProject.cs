@@ -13,6 +13,8 @@ namespace PGM.Model
 
         public string GroupId { get; set; }
 
+        public string GroupName { get; set; }
+
         [JsonIgnore]
         public List<GitlabIssue> Issues { get; set; }
     }
