@@ -59,6 +59,7 @@
             <Button 
                 Grid.Column="1"
                 Width="Auto"
+                ToolTip="Browse Folder"
                 Foreground="{TemplateBinding Foreground}"
                 Style="{StaticResource ButtonFolderEntryStyle}"
                 Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Controls:FolderEntry}}, Path=OpenDirectoryDialogCommand}">
