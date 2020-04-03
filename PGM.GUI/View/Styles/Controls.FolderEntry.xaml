@@ -1,0 +1,83 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:Controls="clr-namespace:PGM.GUI.View.Controls"
+                    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks">
+    <Style x:Key="ButtonFolderEntryStyle" TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="#FF3F3F3F"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="20" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            x:Name="Border" 
+                            Grid.ColumnSpan="2"
+                            CornerRadius="0,3,3,0"
+                            Background="{TemplateBinding Background}"/>
+                        <Border 
+                            Grid.Column="0" 
+                            Margin="1" 
+                            Background="{TemplateBinding Background}" 
+                            BorderBrush="#FF97A0A5"
+                            Height="12"
+                            BorderThickness="0,0,1,0" />
+                        <Viewbox Grid.Column="1" Margin="3">
+                            <iconPacks:PackIconMaterial 
+                                Foreground="{TemplateBinding Foreground}"
+                                Kind="FileDocumentBoxMultipleOutline" />
+                        </Viewbox>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#6F6F6F"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <ControlTemplate x:Key="TextBoxFolderEntryTemplate" TargetType="TextBoxBase">
+        <Border 
+            Padding="2"
+            CornerRadius="3,0,0,3"
+            Background="{TemplateBinding Background}">
+            <ScrollViewer Margin="0"
+                          x:Name="PART_ContentHost" />
+        </Border>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="FolderEntryDefaultTemplate" TargetType="{x:Type Controls:FolderEntry}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button 
+                Grid.Column="1"
+                Width="Auto"
+                Foreground="{TemplateBinding Foreground}"
+                Style="{StaticResource ButtonFolderEntryStyle}"
+                Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Controls:FolderEntry}}, Path=OpenDirectoryDialogCommand}">
+            </Button>
+            <TextBox
+                Grid.Column="0"
+                Foreground="{TemplateBinding Foreground}"
+                Background="{TemplateBinding Background}"
+                Template="{StaticResource TextBoxFolderEntryTemplate}"
+                Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Controls:FolderEntry}}, Path=Path}"/>
+        </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type Controls:FolderEntry}">
+        <Setter Property="MinWidth" Value="120" />
+        <Setter Property="MinHeight" Value="20" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Background" Value="#FF3F3F3F" />
+        <Setter Property="Template" Value="{StaticResource FolderEntryDefaultTemplate}"/>
+    </Style>
+
+</ResourceDictionary>
