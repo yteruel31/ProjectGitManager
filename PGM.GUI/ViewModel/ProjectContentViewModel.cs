@@ -163,6 +163,7 @@ namespace PGM.GUI.ViewModel
             get
             {
                 ICollectionView groupedIssues = CollectionViewSource.GetDefaultView(GitlabIssues);
+                groupedIssues.GroupDescriptions.Clear();
                 groupedIssues.GroupDescriptions.Add(new PropertyGroupDescription(nameof(GitlabIssue.StepType)));
                 return groupedIssues;
             }
