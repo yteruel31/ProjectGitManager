@@ -155,13 +155,8 @@ namespace PGM.GUI.ViewModel
             get
             {
                 ICollectionView view = CollectionViewSource.GetDefaultView(ProjectsVo);
-                PropertyGroupDescription propertyGroupDescription = new PropertyGroupDescription(nameof(ProjectVO.GroupName));
-                
-                if(!view.GroupDescriptions.Contains(propertyGroupDescription))
-                {
-                    view.GroupDescriptions.Add(propertyGroupDescription);
-                }
-                
+                view.GroupDescriptions.Clear();
+                view.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ProjectVO.GroupName)));
                 return view;
             }
         }

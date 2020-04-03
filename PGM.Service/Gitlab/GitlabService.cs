@@ -243,6 +243,7 @@ namespace PGM.Service.Gitlab
             {
                 GitlabProject gitlabProject = new GitlabProject
                 {
+                    GroupName = project.Owner.Name,
                     Id = project.Id.ToString(),
                     Name = project.Name
                 };
