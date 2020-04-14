@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\squirrel.windows.1.9.1\build\squirrel.windows.props" Condition="Exists('..\packages\squirrel.windows.1.9.1\build\squirrel.windows.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -271,6 +271,10 @@
     <Compile Include="ViewModel\StepTypeVO.cs" />
     <Compile Include="ViewModel\SubViewModelBase.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="View\Actions\CloseTabItemAction.cs" />
+    <Compile Include="View\Actions\CommandTriggerAction.cs" />
+    <Compile Include="View\Controls\FlowlTabControl.cs" />
+    <Compile Include="View\Controls\FlowlTabItem.cs" />
     <Compile Include="View\Controls\FolderEntry.cs" />
     <Compile Include="View\IssueDetailControl.xaml.cs">
       <DependentUpon>IssueDetailControl.xaml</DependentUpon>
@@ -325,6 +329,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\ProjectContentControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Styles\Controls.FlowlTabControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Styles\Controls.FlowlTabItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

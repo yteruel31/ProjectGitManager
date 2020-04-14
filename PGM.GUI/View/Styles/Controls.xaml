@@ -1,7 +1,8 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Controls.FolderEntry.xaml"/>
+        <ResourceDictionary Source="Controls.FlowlTabControl.xaml"/>
+        <ResourceDictionary Source="Controls.FlowlTabItem.xaml"/>
         <ResourceDictionary Source="ComboBox.xaml"/>
 
         <ResourceDictionary Source="Dialogs/UserControls.AddProject.xaml"/>

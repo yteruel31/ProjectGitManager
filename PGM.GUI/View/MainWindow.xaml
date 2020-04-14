@@ -5,13 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:I="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:view="clr-namespace:PGM.GUI.View"
+        xmlns:Controls="clr-namespace:PGM.GUI.View.Controls"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         Icon="../Resources/PGM.ico"
         Title="ProjectGitManager" Height="450" Width="800"
         DataContext="{Binding Source={StaticResource Locator}, Path=MainPgm}">
     <Window.Resources>
-        <ResourceDictionary Source="Styles/Controls.xaml"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/Controls.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
     <I:Interaction.Triggers>
         <I:EventTrigger EventName="Loaded">
@@ -27,31 +32,24 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Button Grid.Row="0" 
-                    Content="Add new project" Width="Auto" HorizontalAlignment="Left" Margin="10"
-                    Command="{Binding ShowAddProjectDialogCommand}"/>
-            <mah:MetroTabControl Grid.Row="1" 
-                        ItemsSource="{Binding PgmSettingVo.Projects}"
-                        mah:TabControlHelper.Underlined="TabPanel">
-                <mah:MetroTabControl.ItemContainerStyle>
-                    <Style TargetType="{x:Type mah:MetroTabItem}">
+            <Controls:FlowlTabControl 
+                ItemsSource="{Binding PgmSettingVo.Projects}" 
+                AddNewTabCommand="{Binding ShowAddProjectDialogCommand}">
+                <Controls:FlowlTabControl.ItemContainerStyle>
+                    <Style BasedOn="{StaticResource FlowlTabItemStyle}" TargetType="{x:Type Controls:FlowlTabItem}">
                         <Setter Property="Header" Value="{Binding Name}"/>
-                        <Setter Property="CloseButtonEnabled" Value="True" />
-                        <Setter Property="CloseTabCommand"
-                                Value="{Binding Path=DataContext.DeleteCurrentProjectCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type mah:MetroTabControl}}}" />
-                        <Setter Property="CloseTabCommandParameter" Value="{Binding .}" />
+                        <Setter 
+                            Property="CloseTabCommand" 
+                            Value="{Binding Path=DataContext.DeleteCurrentProjectCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Controls:FlowlTabControl}}}"/>
+                        <Setter Property="CloseTabCommandParameter" Value="{Binding .}"/>
                     </Style>
-                </mah:MetroTabControl.ItemContainerStyle>
-                <mah:MetroTabControl.ContentTemplate>
+                </Controls:FlowlTabControl.ItemContainerStyle>
+                <Controls:FlowlTabControl.ContentTemplate>
                     <DataTemplate>
                         <view:ProjectContentControl DataContext="{Binding Context}"/>
                     </DataTemplate>
-                </mah:MetroTabControl.ContentTemplate>
-            </mah:MetroTabControl>
+                </Controls:FlowlTabControl.ContentTemplate>
+            </Controls:FlowlTabControl>
         </Grid>
         <StatusBar Grid.Row="1" >
             <StatusBarItem Content="PGM" />
