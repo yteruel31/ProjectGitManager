@@ -1,6 +1,6 @@
 # ProjectGitManager: Git project manager
 
-![](pgm_ui.png)
+![](https://raw.githubusercontent.com/yteruel31/ProjectGitManager/master/pgm_ui.png)
 
 ## Documentation
 
